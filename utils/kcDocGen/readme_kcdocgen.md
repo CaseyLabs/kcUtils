@@ -56,7 +56,7 @@ print("Last line!")
 ```    
   
 `kcdocgen mycode.py` will parse every line for `#|` and generate a README file   
-from those comments. The outputted `readme_mycode.py.md` content will look like:  
+from those comments. The generated readme file content will look like:  
   
 <pre>
 # Example
@@ -74,8 +74,5 @@ python example.py
 Hello, World!
 </pre>
 
-The README file will be saved as `readme_mycode.md` in the current folder.
-
-`
-"
-```
+The README file will be saved as `readme_mycode.py.md` in the current folder.
+  

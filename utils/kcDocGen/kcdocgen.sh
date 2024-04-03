@@ -56,7 +56,7 @@
 #| ```  
 #|
 #| `kcdocgen mycode.py` will parse every line for `#|` and generate a README file 
-#| from those comments. The outputted `readme_mycode.py.md` content will look like:
+#| from those comments. The genereated readme file content will look like:
 #|
 #| <pre>
 #| # Example
@@ -74,12 +74,12 @@
 #| Hello, World!
 #| </pre>
 #|
-#| The README file will be saved as `readme_mycode.md` in the current folder.
+#| The README file will be saved as `readme_mycode.py.md` in the current folder.
 #|
 
 kcdocgen() {
 
-  inputName="kc-docs-gen"
+  serviceName="kcdocgen"
 
   # Default: the input will parse comments that start with `#|`
   marker="#|"
@@ -89,7 +89,7 @@ kcdocgen() {
     local level=$1
     local message=$2
     local timestamp=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
-    printf "[%s] [%s] [$inputName] %s\n" "$level" "$timestamp" "$message"
+    printf "[%s] [%s] [$serviceName] %s\n" "$level" "$timestamp" "$message"
   }
 
   # Check if an input file was provided
