@@ -4,7 +4,7 @@ Miscellaneous utilities used by Casey Labs.
 
 ## Utils
 
-## kcDocGen
+### kcDocGen
 
 A simple README generator for source code documentation. 
 
