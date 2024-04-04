@@ -1,8 +1,6 @@
 #| # kcShell
-#| A collection of shell script helper functions to simplify common commands and script writing.
-#|
-#|  We try to make this script as POSIX compliant as possible for operating system portability.
-#|
+#| A collection of POSIX-compatible shell script helper functions, to simplify common commands and script writing.
+#| 
 #| ## Install
 #|
 #| Local setup:
@@ -12,7 +10,8 @@
 #| 
 #| Remote setup:  
 #| ```sh
-#| . <(curl -s https://raw.githubusercontent.com/CaseyLabs/kcUtils/main/utils/kcShell/kcshell.sh)
+#| curl -s https://raw.githubusercontent.com/CaseyLabs/kcUtils/main/utils/kcShell/kcshell.sh > kcshell.sh
+#| . ./kcshell.sh
 #| ```  
 #|
 #| ## Usage
