@@ -36,6 +36,7 @@ fi
 
 kc() {
   local cmd="kc_$1"
+  echo "Running command: $cmd"  # Debugging line
   type $cmd >/dev/null 2>&1
 
   if [ $? -eq 0 ]; then
@@ -46,6 +47,8 @@ kc() {
     return 1
   fi
 }
+
+export -f kc
 
 kc_check() {
   #| ### `kc check`
@@ -72,6 +75,7 @@ kc_os() {
   #| - `kc os install [package]`: installs a package
   #| - `kc os remove [package]`: removes a package
   #| - `kc os upgrade`: upgrades all system pacakages
+  #| - `kc os clean`: cleans up the package manager cache
   #| - `kc os info`: displays the OS name (kcOS) and architecture (kcArch)
 
   if [ -z "$1" ]; then
@@ -87,6 +91,7 @@ kc_os() {
       install_cmd="apt-get install -y"
       remove_cmd="apt-get remove -y"
       upgrade_cmd="apt-get upgrade -y"
+      clean_cmd="apt-get clean && apt-get autoremove -y && rm -rf /var/lib/apt/lists/*"
       ;;
     centos|rhel|fedora)
       install_cmd="yum install -y"
@@ -122,6 +127,9 @@ kc_os() {
       ;;
     remove)
       $sudo_cmd $remove_cmd $2
+      ;;
+    clean)
+      $sudo_cmd $clean_cmd
       ;;
     info)
       echo "Operating System: $kcOS"
