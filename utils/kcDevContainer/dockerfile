@@ -1,0 +1,57 @@
+# syntax=docker/dockerfile:1
+
+#| # kcDevContainer
+#|   
+#| `kcDevContainer` is standardized Docker development environment container.   
+#|   
+#| ## Setup  
+#|   
+#| ```sh
+#| make build
+#| ```  
+#|   
+#| ## Usage  
+#|
+#| Run and enter the container's shell:
+#| ```sh
+#| make run
+#| ```  
+
+#| ## Example
+#| ![kcDevContainer demo image](./kcdev.gif)
+
+FROM debian:latest AS base-layer
+
+RUN apt-get update
+RUN apt-get install -y curl
+
+# ---
+
+FROM base-layer AS dependencies-layer
+
+# Install system packages
+COPY ./config/install-system.sh .
+RUN sh ./install-system.sh && rm ./install-system.sh
+
+# Create a non-root user that matches the host user's ID
+ARG kcUserId
+ARG kcGroupId
+RUN <<EOT
+  groupadd -g $kcGroupId user
+  useradd -m -u $kcUserId -g $kcGroupId user
+  chsh -s $(which zsh) user
+EOT
+USER user
+WORKDIR /home/user
+
+# Install user packages
+COPY ./config/zshrc ./.zshrc
+COPY ./config/install-user.sh .
+RUN sh ./install-user.sh && rm ./install-user.sh
+
+# ---
+
+FROM dependencies-layer AS built-image
+
+# Enter the container with a shell:
+CMD ["/bin/zsh", "-l"]

@@ -10,7 +10,8 @@
 #| 
 #| Remote setup:  
 #| ```sh
-#| curl -s https://raw.githubusercontent.com/CaseyLabs/kcUtils/main/utils/kcShell/kcshell.sh > kcshell.sh
+#| kcScriptUrl="https://raw.githubusercontent.com/CaseyLabs/kcUtils/main/utils/kcShell/kcshell.sh"
+#| curl -s ${kcScriptUrl} > kcshell.sh
 #| . ./kcshell.sh
 #| ```  
 #|
