@@ -40,5 +40,3 @@ zstyle ':completion:*:kill:*' command 'ps -u $USER -o pid,%cpu,tty,cputime,cmd'
 source ~/.local/powerlevel10k/powerlevel10k.zsh-theme
 export POWERLEVEL9K_DISABLE_CONFIGURATION_WIZARD=true
 
-# Import shell helper script:
-. ./.kcshell.sh

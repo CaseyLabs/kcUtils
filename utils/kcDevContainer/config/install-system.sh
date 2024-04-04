@@ -3,11 +3,12 @@ set -e
 
 # --- Install system packages as root
 
-# Import shell helper functions
-scriptUrl="https://raw.githubusercontent.com/CaseyLabs/kcUtils/main/utils/kcShell/kcshell.sh"
-curl -s ${scriptUrl} > kcshell.sh
-. ./kcshell.sh
+# kcShell helper functions
+kcScriptUrl="https://raw.githubusercontent.com/CaseyLabs/kcUtils/main/utils/kcShell/kcshell.sh"
+curl -s ${kcScriptUrl} > kc
+chmod +x kc && mv kc /usr/local/bin/
 
+# system packages
 kc os install \
   apt-transport-https \
   build-essential \
@@ -25,5 +26,3 @@ kc os install \
   zsh
 
 kc os clean
-
-rm ./kcshell.sh
