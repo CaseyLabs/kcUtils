@@ -1,20 +1,15 @@
 #!/bin/sh
 
 #| # kcShell
-#| A collection of POSIX-compatible shell script helper functions, to simplify common commands and script writing.
+#| A collection of POSIX-compatible shell script helper functions, designed to simplify common commands and script writing.
 #| 
 #| ## Install
 #|
-#| Local setup:
-#| ```sh
-#| . /path/to/kcshell.sh
-#| ```
-#| 
-#| Remote setup:  
 #| ```sh
 #| kcScriptUrl="https://raw.githubusercontent.com/CaseyLabs/kcUtils/main/utils/kcShell/kcshell.sh"
-#| curl -s ${kcScriptUrl} > kcshell.sh
-#| . ./kcshell.sh
+#| curl -s ${kcScriptUrl} > kc
+#| chmod +x kc
+#| sudo cp kc /usr/local/bin/
 #| ```  
 #|
 #| ## Usage
@@ -36,18 +31,6 @@ fi
 
 #| ## Available Functions
 
-kc() {
-  cmd="kc_$1"
-  printf "Running command: %s\n" "$cmd"
-  if command -v $cmd >/dev/null 2>&1; then
-    shift
-    $cmd "$@"
-  else
-    printf "Unknown command: %s\n" "$1"
-    return 1
-  fi
-}
-
 kc_check() {
   #| ### `kc check`
   #| Checks if a file, folder, command, or variable exists.
@@ -59,12 +42,8 @@ kc_check() {
     printf "File or folder exists: %s\n" "$1"
   elif command -v "$1" >/dev/null 2>&1; then
     printf "Command exists: %s\n" "$1"
-  elif [ -n "$1" ]; then
-    case "$1" in
-      kcOS) printf "Env var exists: %s\n" "$1" ;;
-      kcArch) printf "Env var exists: %s\n" "$1" ;;
-      *) printf "Could not find: %s\n" "$1"; return 1 ;;
-    esac
+  elif env | grep -q "^$1="; then
+    printf "Env var exists: %s\n" "$1"
   else
     printf "Could not find: %s\n" "$1"
     return 1
@@ -162,3 +141,18 @@ kc_os() {
       ;;
   esac
 }
+
+case "$1" in
+  check)
+    shift
+    kc_check "$@"
+    ;;
+  os)
+    shift
+    kc_os "$@"
+    ;;
+  *)
+    printf "Unknown command: %s\n" "$1"
+    exit 1
+    ;;
+esac

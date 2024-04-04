@@ -1,18 +1,13 @@
 # kcShell  
-A collection of POSIX-compatible shell script helper functions, to simplify common commands and script writing.  
+A collection of POSIX-compatible shell script helper functions, designed to simplify common commands and script writing.  
   
 ## Install  
   
-Local setup:  
-```sh
-. /path/to/kcshell.sh
-```  
-  
-Remote setup:    
 ```sh
 kcScriptUrl="https://raw.githubusercontent.com/CaseyLabs/kcUtils/main/utils/kcShell/kcshell.sh"
 curl -s ${kcScriptUrl} > kcshell.sh
-. ./kcshell.sh
+chmod +x kcshell.sh
+sudo cp kcshell.sh /usr/local/bin/kc
 ```    
   
 ## Usage  
