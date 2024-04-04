@@ -118,9 +118,13 @@ kc_os() {
       ;;
     install)
       if [ "$kcOS" = "ubuntu" ] || [ "$kcOS" = "debian" ]; then
-        $sudo_cmd sh -c "$update_cmd; $install_cmd $2"
+        for pkg in "${@:2}"; do
+          $sudo_cmd sh -c "$update_cmd; $install_cmd $pkg"
+        done
       else
-        $sudo_cmd $install_cmd $2
+        for pkg in "${@:2}"; do
+          $sudo_cmd $install_cmd $pkg
+        done
       fi
       ;;
     remove)
