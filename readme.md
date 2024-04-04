@@ -6,16 +6,11 @@ Miscellaneous utilities used by Casey Labs.
 
 ### [kcDevContainer](https://github.com/CaseyLabs/kcUtils/tree/main/utils/kcDevContainer)
 
-Why rebuild your dev environment on every new machine, when you can build and enter into a
-standardized dev container shell?
+A portable, standardized Docker development environment container.
 
 ### [kcDocGen](https://github.com/CaseyLabs/kcUtils/tree/main/utils/kcDocGen)
 
-A simple README generator for source code documentation. 
-
-`kcdocgen` takes all comments that begin with `#|` from an input file, and writes 
-the content out to a README file. This allows you to write Markdown documentation 
-directly in your source code.  
+A simple README generator for source code documentation, generated from comments within your code. 
 
 ### [kcShell](https://github.com/CaseyLabs/kcUtils/tree/main/utils/kcShell)
 
