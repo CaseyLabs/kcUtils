@@ -127,7 +127,7 @@ kc_os() {
       $sudo_cmd $remove_cmd $2
       ;;
     clean)
-      $sudo_cmd $clean_cmd $2
+      $sudo_cmd eval $clean_cmd
       ;;
     info)
       echo "Operating System: $kcOS"
