@@ -2,24 +2,19 @@
   
 A simple README generator for source code documentation.  
   
-`kcdocgen` is a shell function that extracts all comments beginning with `#|` 
+`kcdocgen` is a shell function that extracts all comments beginning with `#|`   
 from an input file, and writes the content out to a README file.   
   
-This allows you to write Markdown documentation directly in your source code. 
-See the code comments in `kcdocgen.sh` for an example.  
+This allows you to write Markdown documentation directly in your source code.   
+See the code comments in `kcdocgen.sh` for an example.    
   
 ## Setup  
   
-Import the function into your shell:  
-  
-Local setup:  
 ```sh
-. path/to/kcdocgen.sh
-```  
-  
-Remote setup:  
-```sh
-. <(curl -s https://raw.githubusercontent.com/CaseyLabs/kcUtils/main/utils/kcDocGen/kcdocgen.sh)
+kcScriptUrl="https://raw.githubusercontent.com/CaseyLabs/kcUtils/main/utils/kcDocGen/kcdocgen.sh"
+curl -s ${kcScriptUrl} > kcdocgen
+chmod +x kcdocgen
+sudo cp kcdocgen /usr/local/bin/
 ```  
   
 ## Usage  
@@ -48,7 +43,7 @@ Let's say you have a Python file called `mycode.py` with the following content:
 #| Hello, World!  
 
 print("Hello, World!")  
-print("Another line!")  
+print("Don't include this code in the readme!")  
 
 # This comment won't be added to the readme because it 
 # is a regular comment...
@@ -56,7 +51,7 @@ print("Last line!")
 ```    
   
 `kcdocgen mycode.py` will parse every line for `#|` and generate a README file   
-from those comments. The generated readme file content will look like:  
+from those comments. The genereated readme file content will look like:  
   
 <pre>
 # Example
@@ -75,4 +70,11 @@ Hello, World!
 </pre>
 
 The README file will be saved as `readme_mycode.py.md` in the current folder.
-  
+
+<!---
+This script has a bug! Can you guess why the extra characeters below were generated when
+the script is ran on itself? ;-)
+`
+"
+```
+--->
