@@ -48,8 +48,6 @@ kc() {
   fi
 }
 
-export -f kc
-
 kc_check() {
   #| ### `kc check`
   #| Checks if a file, folder, command, or variable exists.
