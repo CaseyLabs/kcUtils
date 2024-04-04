@@ -1,3 +1,5 @@
+#!/bin/sh
+
 #| # kcShell
 #| A collection of POSIX-compatible shell script helper functions, to simplify common commands and script writing.
 #| 
