@@ -1,0 +1,26 @@
+# Get the latest Python image
+FROM python:slim
+
+# Create a non-root user
+RUN useradd -m notroot
+
+# Install system dependencies
+RUN apt-get update && apt-get install -y \
+  curl
+
+# Switch to non-root user
+USER notroot
+WORKDIR /home/notroot
+
+# Install the app dependencies
+COPY ./config/requirements.txt .
+
+RUN pip install --user --no-cache-dir -r ./requirements.txt \
+  && rm ./requirements.txt
+
+# Copy app and user input files
+COPY ./app ./app
+COPY ./input ./input
+
+# Run the app
+CMD ["python", "app/main.py"]

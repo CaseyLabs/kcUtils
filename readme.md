@@ -4,6 +4,10 @@ Miscellaneous utilities used by Casey Labs.
 
 ## Utils
 
+### [kcBlog](https://github.com/CaseyLabs/kcUtils/tree/main/utils/kcBlog)
+
+A static HTML generator that converts Markdown files into a simple documentation website. 
+
 ### [kcDevContainer](https://github.com/CaseyLabs/kcUtils/tree/main/utils/kcDevContainer)
 
 A portable, standardized Docker development environment container.
