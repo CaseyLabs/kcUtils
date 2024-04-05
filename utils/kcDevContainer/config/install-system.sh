@@ -19,7 +19,6 @@ kc os install \
   libssl-dev \
   net-tools \
   software-properties-common \
-  sudo \
   unzip \
   wget \
   zip \
