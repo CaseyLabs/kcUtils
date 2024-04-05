@@ -2,6 +2,12 @@
 
 A simple HTML static site generator (SSG) for markdown files, written in Python.
 
+## Demo
+
+A demo site of `kcBlog` is available at:
+
+**https://caseylabs.github.io/kcUtils/**
+
 ## Requirements
 
 - Docker
@@ -31,6 +37,6 @@ Set your site name by modifying the `kcSiteName` variable in:
 
 Default value: "kcBlog"
 
-## Demo
+## Example
 
 ![Image of kcBlog running](./demo.gif)
