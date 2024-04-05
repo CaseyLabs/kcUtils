@@ -3,12 +3,12 @@ set -e
 
 # --- Install system packages as root
 
-# kcShell helper functions
+# add kcShell helper functions
 kcScriptUrl="https://raw.githubusercontent.com/CaseyLabs/kcUtils/main/utils/kcShell/kcshell.sh"
 curl -s ${kcScriptUrl} > kc
 chmod +x kc && mv kc /usr/local/bin/
 
-# system packages
+# package list
 kc os install \
   apt-transport-https \
   build-essential \
