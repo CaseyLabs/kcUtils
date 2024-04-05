@@ -16,7 +16,7 @@
 #| kcScriptUrl="https://raw.githubusercontent.com/CaseyLabs/kcUtils/main/utils/kcDocGen/kcdocgen.sh"
 #| curl -s ${kcScriptUrl} > kcdocgen
 #| chmod +x kcdocgen
-#| sudo cp kcdocgen /usr/local/bin/
+#| sudo mv kcdocgen /usr/local/bin/
 #| ```
 #|
 #| ## Usage
@@ -91,7 +91,7 @@ log() {
 
 # Check if an input file was provided
 if [ $# -eq 0 ]; then
-  log "error" "No input file provided"
+  log "error" "No input file or folder provided"
   exit 1
 fi
 
@@ -136,8 +136,11 @@ do
     printf "%s\n" "$line" >> "$readme_file"
   else
     printf "%s  \n" "$line" >> "$readme_file"
+    # Add a blank line after each list item
+    case "$line" in
+      -*) printf "\n" >> "$readme_file" ;;
+    esac
   fi
-
 done
 
 # If the last line was inside a code block, add an extra line to end the code block

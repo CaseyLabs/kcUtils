@@ -72,13 +72,4 @@ Hello, World!
 The README file will be saved as `readme_mycode.py.md` in the current folder.
 
 ## Demo
-
 ![Image of kcDocGen running](./demo.gif)
-
-<!---
-This script has a bug! Can you guess why the extra characeters below were generated when
-the script is ran on itself? ;-)
-`
-"
-```
---->
