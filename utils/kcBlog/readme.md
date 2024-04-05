@@ -19,3 +19,6 @@ This project takes a directory of markdown files (`./input`), and generates a st
 
 The generated website includes a table of contents for each markdown file, as well as site breadcrumb navigation.
 
+## Demo
+
+![Image of kcBlog running](./demo.gif)
