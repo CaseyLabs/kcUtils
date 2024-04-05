@@ -42,10 +42,10 @@ def generate_site(input_dir, output_dir):
           css_path = '../' * depth + 'static/main.css'
           home_path = '../' * depth + 'index.html'
           relative_path = os.path.relpath(root, input_dir)
-          breadcrumbs = ''
+          
+          breadcrumbs = '<div class="breadcrumbs">\n'
+          breadcrumbs += '<a href="' + home_path + '">Home</a>\n'
           if relative_path != '.':
-            breadcrumbs = '<div class="breadcrumbs">\n'
-            breadcrumbs += '<a href="' + home_path + '">Home</a>\n'
             for i, part in enumerate(relative_path.split(os.sep)):
               breadcrumbs += ' / <a href="' + '../' * (len(relative_path.split(os.sep)) - i - 1) + 'index.html">' + part + '</a>'
             breadcrumbs += '</div>\n'
