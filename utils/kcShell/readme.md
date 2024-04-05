@@ -5,14 +5,16 @@ A collection of POSIX-compatible shell script helper functions, designed to simp
   
 ```sh
 kcScriptUrl="https://raw.githubusercontent.com/CaseyLabs/kcUtils/main/utils/kcShell/kcshell.sh"
-curl -s ${kcScriptUrl} > kcshell.sh
-chmod +x kcshell.sh
-sudo cp kcshell.sh /usr/local/bin/kc
+curl -s ${kcScriptUrl} > kc
+chmod +x kc
+sudo cp kc /usr/local/bin/
 ```    
   
 ## Usage  
 `kc [command] [args]`  
   
+## Demo  
+![Image of kcShell running](./demo.gif)  
 ## Available Functions  
 ### `kc check`  
 Checks if a file, folder, command, or variable exists.  

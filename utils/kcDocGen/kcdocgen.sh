@@ -73,6 +73,8 @@
 #|
 #| The README file will be saved as `readme_mycode.py.md` in the current folder.
 #|
+#| ## Demo
+#| ![Image of kcDocGen running](./demo.gif)
 
 serviceName="kcdocgen"
 

@@ -19,4 +19,4 @@ make run
 
 ## Example
 
-![kcDevContainer demo image](./kcdev.gif)
+![kcDevContainer demo image](./demo.gif)

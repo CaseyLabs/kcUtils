@@ -15,6 +15,8 @@
 #| ## Usage
 #| `kc [command] [args]`
 #|
+#| ## Demo
+#| ![Image of kcShell running](./demo.gif)
 
 # -- Vars
 
@@ -42,11 +44,23 @@ kc_check() {
     printf "File or folder exists: %s\n" "$1"
   elif command -v "$1" >/dev/null 2>&1; then
     printf "Command exists: %s\n" "$1"
-  elif env | grep -q "^$1="; then
+  elif [ -n "$(printenv $1)" ]; then
     printf "Env var exists: %s\n" "$1"
   else
-    printf "Could not find: %s\n" "$1"
-    return 1
+    case "$1" in
+      "UID") 
+        if [ -n "$UID" ]; then
+          printf "Shell var exists: %s\n" "$1"
+        else
+          printf "Could not find: %s\n" "$1"
+          return 1
+        fi
+        ;;
+      *)
+        printf "Could not find: %s\n" "$1"
+        return 1
+        ;;
+    esac
   fi
 }
 
