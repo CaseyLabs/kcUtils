@@ -1,22 +1,30 @@
+# syntax=docker/dockerfile:1
+
+#| # `kcBlog/dockerfile` 
+#|
+#| This Dockerfile is used to build a Python image that runs the app as a non-root user.
+
 # Get the latest Python image
 FROM python:slim
 
 # Create a non-root user
-RUN useradd -m notroot
+RUN useradd -m user
 
 # Install system dependencies
 RUN apt-get update && apt-get install -y \
   curl
 
 # Switch to non-root user
-USER notroot
-WORKDIR /home/notroot
+USER user
+WORKDIR /home/user
 
 # Install the app dependencies
-COPY ./config/requirements.txt .
+COPY ./app/requirements.txt .
 
-RUN pip install --user --no-cache-dir -r ./requirements.txt \
-  && rm ./requirements.txt
+RUN <<EOT
+  pip install --user --no-cache-dir -r ./requirements.txt
+  rm ./requirements.txt
+EOT
 
 # Copy app and user input files
 COPY ./app ./app
