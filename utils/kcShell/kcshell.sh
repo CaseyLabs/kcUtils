@@ -33,6 +33,43 @@ fi
 
 #| ## Available Functions
 
+kc_log() {
+  #| ### `kc log`
+  #| Simple logging function that logs messages to stdout/stderr.
+  #| Example usage:
+  #| - `kc log info "this is a test message"`
+  #| Example output:
+  #| ```sh
+  #| # Format: $timestamp | $HOSTNAME | [$eventType] $eventMessage
+  #| 2024-04-05T01:27:13Z | thinkpad-linux | [info] test
+  #| ```
+  if [ $# -ne 2 ]; then
+    echo "Usage: kc log [event type] [event message]"
+    return 1
+  fi
+
+  timestamp=$(date +"%Y-%m-%dT%H:%M:%SZ")
+  eventType=$(echo "$1" | tr '[:upper:]' '[:lower:]')
+  eventMessage="$2"
+
+  logPrefix="$timestamp | $HOSTNAME | [$eventType]"
+
+  case "$eventType" in
+    debug)
+      if [ -z "$DEBUG" ] || [ "$DEBUG" = "" ]; then return # Only log if $DEBUG env var is set and non-empty
+      else echo "$logPrefix $eventMessage"
+      fi
+      ;;
+    error)
+      # Send output to stderr (&2):
+      echo "$logPrefix $eventMessage" >&2 ; return
+      ;;
+    *)
+      echo "$logPrefix $eventMessage" ; return
+      ;;
+  esac
+}
+
 kc_check() {
   #| ### `kc check`
   #| Checks if a file, folder, command, or variable exists.
@@ -40,6 +77,11 @@ kc_check() {
   #| - `kc check /path/to/folder`
   #| - `kc check commandName`
   #| - `kc check variableName`
+  if [ $# -ne 1 ]; then
+    echo "Usage: kc check [file/folder/command/variable]"
+    return 1
+  fi
+
   if [ -e "$1" ]; then
     printf "File or folder exists: %s\n" "$1"
   elif command -v "$1" >/dev/null 2>&1; then
@@ -75,7 +117,7 @@ kc_os() {
   #| - `kc os info`: displays the OS name (kcOS) and architecture (kcArch)
 
   if [ -z "$1" ]; then
-    printf "You must provide a command (upgrade, install, remove, info)\n"
+    printf "Usage: kc os [upgrade/install/remove/info]\n"
     return 1
   fi
 
@@ -156,17 +198,11 @@ kc_os() {
   esac
 }
 
-case "$1" in
-  check)
-    shift
-    kc_check "$@"
-    ;;
-  os)
-    shift
-    kc_os "$@"
-    ;;
-  *)
-    printf "Unknown command: %s\n" "$1"
-    exit 1
-    ;;
-esac
+if type "kc_$1" >/dev/null 2>&1; then
+  command="kc_$1"
+  shift
+  $command "$@"
+else
+  printf "Unknown command: %s\n" "$1"
+  exit 1
+fi
