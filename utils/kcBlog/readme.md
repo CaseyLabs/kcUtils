@@ -1,6 +1,8 @@
 # kcBlog
 
-A simple HTML static site generator (SSG) for markdown files, written in Python.
+A simple HTML static site generator (SSG), which turns simple Markdown files into a functional website.
+
+This script is written in Python, built by Docker, with the HTML formatted by [SimpleCSS](https://simplecss.org).
 
 ## Demo
 
