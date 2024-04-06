@@ -1,7 +1,7 @@
 # Home
 
 <div class="notice">
-<p>Welcome to <code>kcBlog</code>, a simple static site generator, powered by Kevin Quirk's <a href="https://simplecss.org">SimpleCSS Framework</a>.</p>
+<p>Welcome to <code>kcBlog</code>, a simple static site generator, powered by Kev Quirk's <a href="https://simplecss.org">SimpleCSS Framework</a>.</p>
 
 <p>See the <strong><a href="https://github.com/CaseyLabs/kcUtils/tree/main/utils/kcBlog">kcBlog Github repo</a></strong> for documentation and setup instructions.</p>
 </div>
