@@ -1,13 +1,20 @@
-# Set up the prompt
+# -- Shell aliases
+alias l='exa  -aF --group-directories-first --octal-permissions --no-permissions --no-time'
+alias ls='l'
 
+# -- Powerlevel10k
+source ~/.local/powerlevel10k/powerlevel10k.zsh-theme
+export POWERLEVEL9K_DISABLE_CONFIGURATION_WIZARD=true
+export POWERLEVEL9K_DISABLE_GITSTATUS=true
+
+# -- Zsh configuration
+
+# Set up the prompt
 autoload -Uz promptinit
 promptinit
 prompt adam1
 
 setopt histignorealldups sharehistory
-
-# Use emacs keybindings even if our EDITOR is set to vi
-bindkey -e
 
 # Keep 1000 lines of history within the shell and save it to ~/.zsh_history:
 HISTSIZE=1000
@@ -35,8 +42,3 @@ zstyle ':completion:*' verbose true
 
 zstyle ':completion:*:*:kill:*:processes' list-colors '=(#b) #([0-9]#)*=0=01;31'
 zstyle ':completion:*:kill:*' command 'ps -u $USER -o pid,%cpu,tty,cputime,cmd'
-
-# Powerlevel10k
-source ~/.local/powerlevel10k/powerlevel10k.zsh-theme
-export POWERLEVEL9K_DISABLE_CONFIGURATION_WIZARD=true
-

@@ -13,6 +13,7 @@ kc os install \
   apt-transport-https \
   build-essential \
   ca-certificates \
+  exa \
   git \
   gnupg \
   jq \

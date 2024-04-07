@@ -30,7 +30,7 @@ FROM base-layer AS dependencies-layer
 
 # Install system packages
 COPY ./config/install-system.sh .
-RUN sh ./install-system.sh && rm ./install-system.sh
+RUN sh ./install-system.sh; rm -f ./install-system.sh
 
 # Create a non-root user that matches the host user's ID
 ARG kcUserId=1000
@@ -44,9 +44,9 @@ USER user
 WORKDIR /home/user
 
 # Install user packages
-COPY ./config/* ./
-COPY ./config/install-user.sh .
-RUN sh ./install-user.sh && rm ./install-user.sh
+COPY --chown=user:user ./config/user-files/* ./
+COPY --chown=user:user ./config/install-user.sh .
+RUN sh ./install-user.sh; rm -f ./install-user.sh
 
 # ---
 
