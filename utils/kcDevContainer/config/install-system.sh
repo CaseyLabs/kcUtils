@@ -20,7 +20,6 @@ kc os install \
   net-tools \
   software-properties-common \
   unzip \
-  wget \
   zip \
   zsh
 
