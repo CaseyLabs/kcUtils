@@ -15,7 +15,6 @@ kc os install \
   ca-certificates \
   exa \
   git \
-  gnupg \
   jq \
   libssl-dev \
   net-tools \
