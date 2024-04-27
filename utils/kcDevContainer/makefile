@@ -1,18 +1,42 @@
-kcServiceName := "kc-dev"
+#| # kcDevContainer
+#|   
+#| `kcDevContainer` is standardized Docker development environment container.   
+#|   
+#| ## Setup  
+#|   
+#| ```sh
+#| make build
+#| ```  
+#|   
+#| ## Usage  
+#|
+#| Run and enter the container's shell:
+#|
+#| ```sh
+#| make run
+#| ```  
+#|
+#| ## Example
+#| ![kcDevContainer demo image](./demo.gif)
 
+ENVFILE = ./config/settings.env
+include $(ENVFILE)
+export $(shell sed '/^\#/d; s/=.*//' $(ENVFILE))
+
+# Available Makefile stages
 .PHONY: build run
 
-build:
-	docker build \
-	--build-arg kcUserId=$(shell id -u) \
-	--build-arg kcGroupId=$(shell id -g) \
-	-t ${kcServiceName} .
+#| ## Setup
 
-run:
-	# Enter the container shell:
-	# (Optional: mount sync folder to container volume)
-	docker run -it \
-		--volume ${HOME}/sync:/home/user/sync \
-		--name ${kcServiceName} \
-		--hostname ${kcServiceName} \
-		--rm ${kcServiceName}
+#| - `make build`: Build the app
+build:
+	docker build --no-cache -t ${kcServiceName} .
+
+cached-build:
+	docker build -t ${kcServiceName} .
+
+#| - `make run`: Run the app
+run: cached-build
+	docker run \
+		-v ${PWD}:/home/user/workdir \
+		-it ${kcServiceName} /bin/zsh

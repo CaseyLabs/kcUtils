@@ -1,32 +1,12 @@
 # syntax=docker/dockerfile:1
 
-#| # kcDevContainer
-#|   
-#| `kcDevContainer` is standardized Docker development environment container.   
-#|   
-#| ## Setup  
-#|   
-#| ```sh
-#| make build
-#| ```  
-#|   
-#| ## Usage  
-#|
-#| Run and enter the container's shell:
-#| ```sh
-#| make run
-#| ```  
-
-#| ## Example
-#| ![kcDevContainer demo image](./demo.gif)
-
-FROM debian:latest AS base-layer
+FROM debian:stable AS base-base
 
 RUN apt-get update && apt-get install -y curl
 
 # ---
 
-FROM base-layer AS dependencies-layer
+FROM base-base AS dependencies-base
 
 # Install system packages
 COPY ./config/install-system.sh .
@@ -50,7 +30,9 @@ RUN sh ./install-user.sh; rm -f ./install-user.sh
 
 # ---
 
-FROM dependencies-layer AS built-image
+FROM dependencies-base AS built-image
+
+WORKDIR /home/user/workdir
 
 # Enter the container with a shell:
 CMD ["/bin/zsh", "-l"]
