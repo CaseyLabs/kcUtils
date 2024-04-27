@@ -2,11 +2,6 @@
 alias l='exa  -aF --group-directories-first --octal-permissions --no-permissions --no-time'
 alias ls='l'
 
-# -- Powerlevel10k
-source ~/.local/powerlevel10k/powerlevel10k.zsh-theme
-export POWERLEVEL9K_DISABLE_CONFIGURATION_WIZARD=true
-export POWERLEVEL9K_DISABLE_GITSTATUS=true
-
 # -- Zsh configuration
 
 # Set up the prompt
