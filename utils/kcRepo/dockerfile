@@ -1,0 +1,39 @@
+# syntax=docker/dockerfile:1
+
+#| ### `dockerfile`
+#| Builds a Docker image that runs as a non-root user.
+
+FROM debian:stable-slim AS base-stage
+
+RUN apt-get update && apt-get install -y curl
+
+# ---
+
+FROM base-stage AS dependencies-stage
+
+# Install system packages
+COPY ./config/install-system.sh .
+RUN sh ./install-system.sh; rm -f ./install-system.sh
+
+# Create a non-root user that matches the host user's ID
+ARG kcUserId=1000
+ARG kcGroupId=1000
+RUN <<EOT
+  groupadd -g $kcGroupId user
+  useradd -m -u $kcUserId -g $kcGroupId user
+  chsh -s $(which zsh) user
+EOT
+USER user
+WORKDIR /home/user
+
+# Install user packages
+COPY --chown=user:user ./config/user-files/* ./
+COPY --chown=user:user ./config/install-user.sh .
+RUN sh ./install-user.sh; rm -f ./install-user.sh
+
+# ---
+
+FROM dependencies-stage AS service-image
+
+# Start the app
+CMD ["sh", "./app/start.sh"]
