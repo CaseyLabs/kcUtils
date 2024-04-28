@@ -69,14 +69,12 @@ jobs:
         with:
           context: ./utils/kcDevContainer
           push: ${{ github.event_name != 'pull_request' }}
-          tags: ${{ steps.meta.outputs.tags }}
+          tags: |
+            ${{ steps.meta.outputs.tags }}
+            user/app:devcontainer
           labels: ${{ steps.meta.outputs.labels }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
-
-      - name: Tag the Docker image with "devcontainer"
-        if: ${{ github.event_name != 'pull_request' }}
-        run: docker tag ${{ steps.build-and-push.outputs.digest }} ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:devcontainer
 
       # Sign the resulting Docker image digest except on PRs.
       # This will only write to the public Rekor transparency log when the Docker
