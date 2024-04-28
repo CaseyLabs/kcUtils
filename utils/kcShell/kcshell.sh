@@ -21,11 +21,11 @@
 # -- Vars
 
 # Detect the OS and architecture
-kcOS=`grep '^ID=' /etc/os-release | cut -f2 -d'='`
-kcArch=`uname -m`
+export kcOS=`grep '^ID=' /etc/os-release | cut -f2 -d'='`
+export kcArch=`uname -m`
 
 # Check if we are root
-if [ "`id | cut -d'=' -f2 | cut -d'(' -f1`" -ne 0 ]; then
+if [ "$UID" -ne 0 ]; then
   sudo_cmd=sudo
 else
   sudo_cmd=
@@ -70,6 +70,8 @@ kc_log() {
   esac
 }
 
+# ---
+
 kc_check() {
   #| ### `kc check`
   #| Checks if a file, folder, command, or variable exists.
@@ -105,6 +107,8 @@ kc_check() {
     esac
   fi
 }
+
+# ---
 
 kc_os() {
   #| ### `kc os`
@@ -197,6 +201,10 @@ kc_os() {
       ;;
   esac
 }
+
+# ---
+
+# Call the function:
 
 if type "kc_$1" >/dev/null 2>&1; then
   command="kc_$1"
