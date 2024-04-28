@@ -1,6 +1,6 @@
 # syntax=docker/dockerfile:1
 
-FROM debian:stable AS base-base
+FROM debian:stable-slim AS base-base
 
 RUN apt-get update && apt-get install -y curl
 
