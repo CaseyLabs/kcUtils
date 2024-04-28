@@ -25,7 +25,7 @@ export kcOS=`grep '^ID=' /etc/os-release | cut -f2 -d'='`
 export kcArch=`uname -m`
 
 # Check if we are root
-if [ "$UID" -ne 0 ]; then
+if [ "$(id -u)" -ne 0 ]; then
   sudo_cmd=sudo
 else
   sudo_cmd=
