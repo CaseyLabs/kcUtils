@@ -1,2 +1,3 @@
 data/secrets/*
-
+# Allow encrypted SOPS files:
+!data/secrets/*.enc
