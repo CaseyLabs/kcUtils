@@ -289,7 +289,7 @@ In your repo, ensure that files that contain secrets (such as `.env` files) are 
 !*.encrypted.*
 ```
 
---
+---
 
 ### `.sops.yaml`
 
