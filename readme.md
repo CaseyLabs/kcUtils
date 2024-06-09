@@ -23,3 +23,7 @@ A git repository template for new projects.
 ### [kcShell](https://github.com/CaseyLabs/kcUtils/tree/main/utils/kcShell)
 
 A collection of shell script helper functions to simplify common commands and script writing.
+
+### [kcSops](https://github.com/CaseyLabs/kcUtils/tree/main/utils/kcSops)
+
+An example of using Mozilla `SOPS` for encrypting and decrypting files.
