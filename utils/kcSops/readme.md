@@ -4,7 +4,6 @@
 
 <!-- TOC -->
 
-- [Mozilla SOPS](#mozilla-sops)
 - [What is SOPS?](#what-is-sops)
   - [Key Features](#key-features)
 - [Setup](#setup)
