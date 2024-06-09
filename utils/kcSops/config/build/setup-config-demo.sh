@@ -1,6 +1,6 @@
 #!/bin/bash
 
-secrets_file="./secrets.devtest.env"
+secrets_file="./devtest.env"
 
 cat <<EOT > "${secrets_file}"
 KC_VAR1="value1"
@@ -31,7 +31,7 @@ for environment in "${environments[@]}"; do
   # Build the sops configuration for the environment
   sops_config+="
   # Encrypt devtest env files with 
-  - path_regex: .*devtest\.env$
+  - path_regex: .*devtest(\.encrypted)?\.env$
     kms: '${key_arn}'
   
   "

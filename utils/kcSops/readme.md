@@ -80,6 +80,8 @@ Set-ExecutionPolicy RemoteSigned -Scope CurrentUser
 
 In this demo, we will encrypt a file for a `devtest` environment, using AWS KMS as our external key management service.
 
+![Demo GIF](./demo.gif)
+
 _Run these examples in a Linux/MacOS/WSL terminal._
 
 ### Create a Secrets File (`secrets.env`)
@@ -166,7 +168,7 @@ for environment in "${environments[@]}"; do
   # Build the sops configuration for the environment
   sops_config+="
   # Encrypt devtest env files with 
-  - path_regex: .*devtest\.env$
+  - path_regex: .*devtest(\.encrypted)?\.env$
     kms: '${key_arn}'
   
   "
@@ -181,7 +183,7 @@ And the genereated `.sops.yaml` will look like this:
 ```yaml
 creation_rules:
   # Encrypt devtest env files with devtest KMS key
-  - path_regex: .*devtest\.env$
+  - path_regex: .*devtest(\.encrypted)?\.env$
     kms: 'arn:aws:kms:us-west-2:123456789:key/mrk-123456789'
 ```
 </details>
@@ -194,7 +196,7 @@ creation_rules:
 **Encrypted env file names must be in this format: `${name}.encrypted.env`**
 
 ```sh
-# Encrypt the file with KMS
+# Encrypt the file with devtest environment's AWS KMS key
 sops --encrypt devtest.env > devtest.encrypted.env
 ```
 
