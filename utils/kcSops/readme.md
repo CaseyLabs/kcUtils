@@ -327,7 +327,7 @@ for environment in "${environments[@]}"; do
 
   # Build the sops configuration for the environment
   sops_config+="
-- path_regex: .*\.${environment}\.env$
+- path_regex: *${environment}\.env$
   kms: ${key_arn}
   encrypted_suffix: .encrypted.env"
 done
@@ -343,16 +343,16 @@ And the output would look like:
 cat .sops.yaml
 
 creation_rules:
-- path_regex: .*\.prod\.env$
+- path_regex: *prod\.env$
   kms: arn:aws:kms:us-west-2:12345678:key/my-prod-alias-id
   encrypted_suffix: .encrypted.env
-- path_regex: .*\.stage\.env$
+- path_regex: *stage\.env$
   kms: arn:aws:kms:us-west-2:12345678:key/my-stage-alias-id
   encrypted_suffix: .encrypted.env
-- path_regex: .*\.dev\.env$
+- path_regex: *dev\.env$
   kms: arn:aws:kms:us-west-2:12345678:key/my-dev-alias-id
   encrypted_suffix: .encrypted.env
-- path_regex: .*\.local\.env$
+- path_regex: *local\.env$
   kms: arn:aws:kms:us-west-2:12345678:key/my-local-alias-id
   encrypted_suffix: .encrypted.env
 ```
