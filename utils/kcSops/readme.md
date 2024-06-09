@@ -210,7 +210,7 @@ Encrypt the file with SOPS with the AWS KMS key (in this example, using the KMS 
 
 ### Example: Encrypt with Google Cloud Platform (GCP KMS)
 
-Create a GCP KMS kering for a `devtest` environment:
+Create a GCP KMS keyring for a `devtest` environment:
 
 ```sh
   export environment="devtest"
