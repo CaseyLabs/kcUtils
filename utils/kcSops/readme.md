@@ -1,10 +1,12 @@
 # `kcSops`
+  
+## A demo of **[Mozilla SOPS](https://github.com/getsops/sops)** for file encryption, using AWS KMS and/or GCP KMS.
 
-A demo of **[Mozilla SOPS](https://github.com/getsops/sops)** for file encryption, using AWS KMS and/or GCP KMS.
 ---
 
 <!-- TOC -->
 
+- [Mozilla SOPS](#mozilla-sops)
 - [What is SOPS?](#what-is-sops)
   - [Key Features](#key-features)
 - [Setup](#setup)
@@ -16,13 +18,13 @@ A demo of **[Mozilla SOPS](https://github.com/getsops/sops)** for file encryptio
   - [Create a Secrets File (`secrets.env`)](#create-a-secrets-file-secretsenv)
   - [Example: Encrypt with Amazon Web Services (AWS KMS)](#example-encrypt-with-amazon-web-services-aws-kms)
     - [Encrypt the File](#encrypt-the-file)
-    - [Results](#results)
     - [Decrypt the File](#decrypt-the-file)
   - [Example: Encrypt with Google Cloud Platform (GCP KMS)](#example-encrypt-with-google-cloud-platform-gcp-kms)
     - [Encrypt the file](#encrypt-the-file)
     - [Decrypt the file](#decrypt-the-file)
-- [Setup `.ignore` files](#setup-ignore-files)
+- [Setup config files](#setup-config-files)
   - [`.gitignore`](#gitignore)
+  - [`.sops.yaml`](#sopsyaml)
 
 <!-- /TOC -->
 
@@ -150,7 +152,7 @@ Encrypt the file with SOPS with the AWS KMS key (in this example, using the KMS 
   fi
 ```
 
-#### Results
+##### Results
 
 ```sh
   ❯ cat config/secrets.env
@@ -274,7 +276,7 @@ Decrypt the file with SOPS using the GCP KMS key:
 
 ---
 
-## Setup `.ignore` files
+## Setup config files
 
 In your repo, ensure that files that contain secrets (such as `.env` files) are not accidentally commited, but do allow encrypted files (`*.encrypted.*`) to be commited.
 
@@ -292,7 +294,7 @@ In your repo, ensure that files that contain secrets (such as `.env` files) are 
 
 --
 
-## Setup `.sops.yaml` file
+### `.sops.yaml`
 
 It is often tedious to specify the `--kms` `--gcp-kms` `--pgp` and `--age` parameters for creation of all new files. 
 
