@@ -1,7 +1,6 @@
 # `kcSops`
 
-A demo of using **[Mozilla SOPS](https://github.com/getsops/sops)** for file encryption with AWS KMS.
-
+A demo of **[Mozilla SOPS](https://github.com/getsops/sops)** for file encryption, using AWS KMS and/or GCP KMS.
 ---
 
 <!-- TOC -->
