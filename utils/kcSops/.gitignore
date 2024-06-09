@@ -1,0 +1,11 @@
+# Don't commit sensitive files
+.env
+*.env
+*.env.*
+*.decrypted
+*.decrypted.*
+*.unencrypted
+*.unencrypted.*
+
+# But allow SOPS encrypted files
+!*.encrypted.*
