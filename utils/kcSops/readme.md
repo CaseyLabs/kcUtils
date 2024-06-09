@@ -84,7 +84,7 @@ In this demo, we will encrypt a file for a `devtest` environment, using AWS KMS 
 
 _Run these examples in a Linux/MacOS/WSL terminal._
 
-### Create a Secrets File (`secrets.env`)
+#### Create a Secrets File (`secrets.env`)
 
 <details>
 <summary>Secrets File setup</summary>
@@ -103,7 +103,7 @@ EOT
 ```
 </details>
 
-### Create an AWS KMS key
+#### Create an AWS KMS key
 
 <details>
 <summary>AWS KMS setup</summary>
@@ -132,7 +132,7 @@ aws kms create-alias --alias-name "alias/${environment}" --target-key-id "$key_i
 _Pro-Tip:_ Consider creating a secondary Disaster Recovery (DR) AWS KMS key in a backup AWS account.
 </details>
 
-### Create a Config File (`.sops.yaml`)
+#### Create a Config File (`.sops.yaml`)
 
 <details>
 <summary>Config File setup</summary>
@@ -241,7 +241,7 @@ cat devtest.env.unencrypted
 rm devtest.env.unencrypted
 ```
 
-##### Results
+**Results:**
 
 ```sh
 ❯ cat config/secrets.env.unencrypted
@@ -252,6 +252,26 @@ KC_VAR3="value3"
 KC_VAR4="value4"
 ```
 
+</details>
+
+#### Export Environment Varibles
+
+Decrypt the encrypted `.env` file, and export its keys/values to your shell's environment variables.
+
+<details>
+<summary>Export steps</summary>
+
+```sh
+export $(sops --decrypt devtest.encrypted.env | grep -v '^#' | xargs)
+```
+
+**Results:**
+
+```sh
+echo $KC_VAR1
+
+value1
+```
 </details>
 
 ---
