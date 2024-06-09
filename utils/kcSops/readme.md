@@ -290,3 +290,76 @@ In your repo, ensure that files that contain secrets (such as `.env` files) are 
 !*.encrypted.*
 ```
 
+--
+
+## Setup `.sops.yaml` file
+
+It is often tedious to specify the `--kms` `--gcp-kms` `--pgp` and `--age` parameters for creation of all new files. 
+
+You can create a `.sops.yaml` configuration file at the root directory to define which keys are used for which filename.
+
+For example:
+
+- files under `./config/*.prod.env` should use the `prod` AWS KMS key
+- files under `./config/*.stage.env` should use the `stage` AWS KMS key
+- files under `./config/*.dev.env` should use the `dev` AWS KMS key
+
+The contents of `./.sops.yaml` could be generated with a script like this:
+
+```sh
+# Define environments
+environments=("prod" "stage" "dev" "local")
+
+# Initialize sops configuration
+sops_config="creation_rules:"
+
+# Loop through each environment to get the KMS key and build the sops configuration
+for environment in "${environments[@]}"; do
+  # Get the alias for the environment
+  key_alias="alias/${environment}"
+
+  # Get the KMS key ID for the alias
+  key_id=$(aws kms list-aliases --query "Aliases[?AliasName=='${key_alias}'].TargetKeyId" --output text)
+
+  # Construct the ARN for the KMS key
+  region=$(aws configure get region)
+  account_id=$(aws sts get-caller-identity --query Account --output text)
+  key_arn="arn:aws:kms:${region}:${account_id}:key/${key_id}"
+
+  # Build the sops configuration for the environment
+  sops_config+="
+- path_regex: .*\.${environment}\.env$
+  kms: ${key_arn}
+  encrypted_suffix: .encrypted.env"
+done
+
+# Write the configuration to .sops.yaml
+echo "$sops_config" > .sops.yaml
+```
+
+And the output would look like:
+
+```sh
+# Output the generated configuration
+cat .sops.yaml
+
+creation_rules:
+- path_regex: .*\.prod\.env$
+  kms: arn:aws:kms:us-west-2:12345678:key/my-prod-alias-id
+  encrypted_suffix: .encrypted.env
+- path_regex: .*\.stage\.env$
+  kms: arn:aws:kms:us-west-2:12345678:key/my-stage-alias-id
+  encrypted_suffix: .encrypted.env
+- path_regex: .*\.dev\.env$
+  kms: arn:aws:kms:us-west-2:12345678:key/my-dev-alias-id
+  encrypted_suffix: .encrypted.env
+- path_regex: .*\.local\.env$
+  kms: arn:aws:kms:us-west-2:12345678:key/my-local-alias-id
+  encrypted_suffix: .encrypted.env
+```
+
+Editing a file with the right keys is now as simple as:
+
+```
+sops edit prod.env
+```
