@@ -135,7 +135,7 @@ aws kms create-alias --alias-name "alias/${environment}" --target-key-id "$key_i
 _**Pro-Tip:**_ Consider creating a secondary Disaster Recovery (DR) AWS KMS key in a backup AWS account.
 </details>
 
-#### Create a Config File (`.sops.yaml`)
+### Create a Config File (`.sops.yaml`)
 
 <details>
 <summary>Config File setup</summary>
@@ -281,11 +281,11 @@ value1
 
 ### Example: Encrypt with Google Cloud Platform (GCP KMS)
 
-Create a GCP KMS keyring for a `devtest` environment.
-
 <details>
 
 <summary>GCP KMS Steps</summary>
+
+Create a GCP KMS keyring for a `devtest` environment.
 
 ```sh
 export environment="devtest"
