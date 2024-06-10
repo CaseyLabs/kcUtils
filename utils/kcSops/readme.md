@@ -87,7 +87,7 @@ In this demo, we will encrypt a file for a `devtest` environment, using AWS KMS 
 
 _Run these examples in a Linux/MacOS/WSL terminal._
 
-#### Create a Secrets File (`secrets.env`)
+### Create a Secrets File (`secrets.env`)
 
 <details>
 <summary>Secrets File setup</summary>
@@ -106,7 +106,7 @@ EOT
 ```
 </details>
 
-#### Create an AWS KMS key
+### Create an AWS KMS key
 
 <details>
 <summary>AWS KMS setup</summary>
@@ -191,7 +191,7 @@ creation_rules:
 ```
 </details>
 
-#### Encrypt the File
+### Encrypt the File
 
 <details>
 <summary>Encryption steps</summary>
@@ -223,7 +223,7 @@ rm devtest.env
 ```
 </details>
 
-#### Decrypt the File
+### Decrypt the File
 
 <details>
 <summary>Decryption steps</summary>
@@ -257,7 +257,7 @@ KC_VAR4="value4"
 
 </details>
 
-#### Export Environment Variables
+### Export Environment Variables
 
 <details>
 <summary>Export steps</summary>
