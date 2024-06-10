@@ -31,12 +31,12 @@ SOPS integrates seamlessly with cloud-managed key management systems (such as AW
 - Encrypt sensitive key values in config files, such as `.env` files
   
 **Multiple file format support**
-- Works with JSON, YAML, ENV, and INI files
+- Works with `json`, `yaml`, `env`, and `ini` files
   
 **KMS Integration**
 - Supports AWS KMS, GCP KMS, Azure Key Vault, Hashicorp Vault, and PGP
 - Files can be encrypted with more than one KMS provider
-- This mean your secrets encryption is not dependent on a single KMS vendor or cloud provider
+- This mean your secrets management is not dependent on a single KMS vendor or cloud provider
   
 **Git Integration**
 - Allows you to store encrypted secrets in a git repo
@@ -234,7 +234,8 @@ rm devtest.env
 sops devtest.encrypted.env
 ```
 
-Or decrypt to an unencrypted file (_Warning: don't commit that unecrypted file to the repo!_):
+Or decrypt to an unencrypted file:
+(_Warning: don't commit the unencrypted file to the repo!_)
 
 ```sh
 sops --decrypt devtest.encrypted.env > devtest.env.unencrypted
@@ -346,7 +347,11 @@ fi
 
 ### Configure `.gitignore`
 
-In your repo, ensure that files that contain secrets (such as `.env` files) are not accidentally committed, but do allow encrypted files (`*.encrypted.*`) to be committed.
+In your repo, add a `.gitignore` file to:
+
+- Prevent files that contain secrets (such as `.env` files) from being accidentally committed
+
+- But also allow encrypted files (`*.encrypted.*`) to be committed
 
 ```
 cat <<EOT > ".gitignore"
