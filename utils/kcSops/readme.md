@@ -1,6 +1,6 @@
 # `kcSops`
   
-**A demo of [Mozilla SOPS](https://github.com/getsops/sops) for file encryption, using AWS KMS and/or GCP KMS.**
+**A demo of Mozilla's [SOPS](https://github.com/getsops/sops) for file encryption, using AWS KMS and/or GCP KMS.**
 
 <!-- TOC -->
 
@@ -19,21 +19,31 @@
 
 ## What is SOPS?
 
-Mozilla SOPS ("_secrets operations_") is an open-source tool written in Go. `sops` is used to easily encrypt and decrypt sensitive data in a config files, such as `.env` files. 
+Mozilla's `SOPS` ("_secrets operations_") is an open-source tool written in Go. 
 
-SOPS integrates seamlessly with cloud-managed key management systems (such as AWS KMS or GCP KMS), and provides a straightforward way to securely distribute your application's secrets with team members.
+SOPS is used to easily encrypt and decrypt sensitive data in a config files, such as `.env` files. 
 
-### Key Features
+SOPS integrates seamlessly with cloud-managed key management systems (such as AWS KMS or GCP KMS), and provides an easy way to securely distribute your app's secrets with team members.
 
-- **File-based encryption**: Encrypt sensitive key values in config files, such as `.env` files.
+### Features
+
+**File-based encryption**
+- Encrypt sensitive key values in config files, such as `.env` files
   
-- **Multiple file forrmat support**: Works with JSON, YAML, ENV, and INI files.
+**Multiple file format support**
+- Works with JSON, YAML, ENV, and INI files
   
-- **KMS Integration**: Supports AWS KMS, GCP KMS, Azure Key Vault, Hashicorp Vault, and PGP.
+**KMS Integration**
+- Supports AWS KMS, GCP KMS, Azure Key Vault, Hashicorp Vault, and PGP
+- Files can be encrypted with more than one KMS provider
+- This mean your secrets encryption is not dependent on a single KMS vendor or cloud provider
   
-- **Git Integration**: Ideal for storing encrypted secrets in version control systems like Git.
+**Git Integration**
+- Allows you to store encrypted secrets in a git repo
 
-- **CI/CD and Kubernetes Integration**: Can be easily implemented with existing code delivery systems.
+**CI/CD and Kubernetes Integration**
+- Can be easily implemented with existing code delivery systems
+- Encrypted values can be easily be exported to a shell environment
   
 ---
 
@@ -49,29 +59,22 @@ SOPS integrates seamlessly with cloud-managed key management systems (such as AW
 
 #### Linux/MacOS
 
-<details>
-<summary>Linux/MacOS install</summary>
-
 In your Terminal, run the following commands:
 
-```
+```sh
 ./config/build/install-sops.sh
 ```
-</details>
 
 #### Windows
-
-<details>
-<summary>Windows install</summary>
 
 In a Powershell terminal, run:
 
 ```powershell
 Set-ExecutionPolicy RemoteSigned -Scope CurrentUser
+
 .\config\build\install-sops.ps1
 ```
-</details>
- 
+
 ---
 
 ## Usage
@@ -129,7 +132,7 @@ export key_id=$(echo "${output}" | grep -o '"KeyId": *"[^"]*"' | head -n 1 | awk
 aws kms create-alias --alias-name "alias/${environment}" --target-key-id "$key_id"
 ```
 
-_Pro-Tip:_ Consider creating a secondary Disaster Recovery (DR) AWS KMS key in a backup AWS account.
+_**Pro-Tip:**_ Consider creating a secondary Disaster Recovery (DR) AWS KMS key in a backup AWS account.
 </details>
 
 #### Create a Config File (`.sops.yaml`)
@@ -143,7 +146,7 @@ For example:
 
 - Files that contain `*devtest.env` should use the `devtest` AWS KMS key
 
-We can genereate the config file using a script like this:
+We can generate the config file using a script like this:
 
 ```sh
 # Define environments
@@ -178,7 +181,7 @@ done
 echo "$sops_config" > .sops.yaml
 ```
 
-And the genereated `.sops.yaml` will look like this:
+And the generated `.sops.yaml` will look like this:
 
 ```yaml
 creation_rules:
@@ -205,10 +208,10 @@ Verify the new file is encrypted:
 ```sh
 ❯ cat devtest.encrypted.env
 
-KC_VAR1=ENC[AES256_GCM,data:I0Jlkv3HaMA=,iv:GHBfxz2a5R9tX+61eZz1spi7VChatKkpWVEozqFUuu4=,tag:iK/FSwRjlA6fHQVQi+dVkA==,type:str]
-KC_VAR2=ENC[AES256_GCM,data:2qDsfdr4MtA=,iv:K6h76s+deyyS7Vx8XLhdccyN5UsGYSi8r2MbY55mtMg=,tag:h8onJ+oTpmNGoqolZO8ixA==,type:str]
-KC_VAR3=ENC[AES256_GCM,data:MAwj7EvVJ74=,iv:8ugmNO6EY99MZkxAKCyvHQMeWrV0wfKsT2Z5907JR1U=,tag:1FS7MlPx39MJVGCO10YPLA==,type:str]
-KC_VAR4=ENC[AES256_GCM,data:WKH2jUseqdc=,iv:Qg04P/XEgRH3B5BHaCiZq4/WP4oG/MQbxBsfzB8qC5U=,tag:3oOJFlR19P2gvHZykAIsdA==,type:str]
+KC_VAR1=ENC[AES256_GCM,data:I0Jlkv3HaMA=,iv:GHBfxX,tag:iK/FSwRjlA6fHQVQi+dVkA==,type:str]
+KC_VAR2=ENC[AES256_GCM,data:2qDsfdr4MtA=,iv:K6h76s,tag:h8onJ+oTpmNGoqolZO8ixA==,type:str]
+KC_VAR3=ENC[AES256_GCM,data:MAwj7EvVJ74=,iv:8ugmN=,tag:1FS7MlPx39MJVGCO10YPLA==,type:str]
+KC_VAR4=ENC[AES256_GCM,data:WKH2jUseqdc=,iv:Qg04P=,tag:3oOJFlR19P2gvHZykAIsdA==,type:str]
 sops_kms__list_0__map_arn=arn:aws:kms:us-west-2:123456789:key/mrk-123456789
 [...]
 ```
@@ -224,7 +227,6 @@ rm devtest.env
 
 <details>
 <summary>Decryption steps</summary>
-
 
 **Edit the encrypted file in-place with the SOPS text editor:**
 
@@ -254,12 +256,12 @@ KC_VAR4="value4"
 
 </details>
 
-#### Export Environment Varibles
-
-Decrypt the encrypted `.env` file, and export its keys/values to your shell's environment variables.
+#### Export Environment Variables
 
 <details>
 <summary>Export steps</summary>
+
+Decrypt the encrypted `.env` file, and export its keys/values to your shell's environment variables.
 
 ```sh
 export $(sops --decrypt devtest.encrypted.env | grep -v '^#' | xargs)
@@ -344,7 +346,7 @@ fi
 
 ### Configure `.gitignore`
 
-In your repo, ensure that files that contain secrets (such as `.env` files) are not accidentally commited, but do allow encrypted files (`*.encrypted.*`) to be commited.
+In your repo, ensure that files that contain secrets (such as `.env` files) are not accidentally committed, but do allow encrypted files (`*.encrypted.*`) to be committed.
 
 ```
 cat <<EOT > ".gitignore"
@@ -361,3 +363,4 @@ cat <<EOT > ".gitignore"
 !*.encrypted.*
 EOT
 ```
+
