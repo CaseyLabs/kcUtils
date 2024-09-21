@@ -20,6 +20,7 @@ sudo cp kc /usr/local/bin/
 ### `kc log`
 
 Simple logging function that logs messages to stdout/stderr.
+
 Usage: `kc log [event type] [event message]`
 
 Example: 
@@ -36,7 +37,7 @@ Example:
 
 Checks if a file, folder, command, or variable exists.
 
-Usage: kc check [file/folder/command/variable]
+Usage: `kc check [file/folder/command/variable]`
 
 Examples:
 - `kc check /path/to/file`
@@ -59,6 +60,7 @@ Commands for Linux system package managers, such as apt, yum, pacman, apk
 Usage: `kc os [update/upgrade/install/remove/clean/info]`
 
 Example:
+
 ```
 kc os install curl
 kc os remove wget
@@ -67,7 +69,7 @@ kc os upgrade # automatic upgrade of all system packages
 
 ### `kc edit`
 
-Edits a file (with sudo automatically if neeeded) and saves a backup 
+Edits a file (with sudo automatically if neeeded), and saves a backup to `/path/.kcbackup/`
 
 (Default backup retention: 5)
 
