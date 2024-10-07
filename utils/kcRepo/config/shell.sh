@@ -1,5 +1,7 @@
 #!/bin/sh
 
+set -e
+
 #| `kcShell`
 #| A collection of POSIX-compatible shell helper functions, designed to simplify shell script writing.
 

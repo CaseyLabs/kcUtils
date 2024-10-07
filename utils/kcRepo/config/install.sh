@@ -1,6 +1,11 @@
 #!/bin/sh
-set -eu
+set -e
 
+#| install.sh
+#| ---
+#| Installs the tooling needed to run the ./src source code
+
+# Since we are running a Go app, we'll need to install in the container locally:
 echo "Installing Golang using mise-cli (https://mise.jdx.dev/)"
 
 mkdir -p ~/.local/bin

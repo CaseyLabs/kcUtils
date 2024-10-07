@@ -11,7 +11,7 @@ ARG KC_CONTAINER_IMAGE=ubuntu:latest
 FROM ${KC_CONTAINER_IMAGE} AS base-stage
 
 # Install kc shell helper script
-COPY ./config/kcshell.sh /usr/bin/kc
+COPY ./config/shell.sh /usr/bin/kc
 RUN chmod +x /usr/bin/kc
 
 # Install packages defined in system-packages.cfg
@@ -59,6 +59,7 @@ WORKDIR /home/$KC_CONTAINER_USER
 
 COPY --chown=$KC_CONTAINER_USER:$KC_CONTAINER_USER ./src/* .
 COPY --chown=$KC_CONTAINER_USER:$KC_CONTAINER_USER ./config/install.sh .
+COPY --chown=$KC_CONTAINER_USER:$KC_CONTAINER_USER ./config/run.sh .
 
 # Install and build source code as non-root user
 USER $KC_CONTAINER_USER
@@ -73,5 +74,5 @@ EOT
 
 FROM build-stage AS final-stage
 
-# Start the built source code
-CMD ["sh", "./app.sh"]
+# Run the built source code
+CMD ["sh", "./run.sh"]

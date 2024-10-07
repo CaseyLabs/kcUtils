@@ -1,6 +1,22 @@
 # `kcRepo`
 
-A git repository template for new projects.
+A flexible, container-driven git repository template for new projects.
+
+### Features
+
+- Drop your source code into `./src`
+
+- Change your base image in `./config/settings.cfg`
+
+- Put your app's install commands in `./config/install.sh` and run commands in `./config/run.sh`
+
+- Hit `./start build && ./start run`
+
+- And boom, your app will be built and running in a container!
+
+## Demo
+
+![Image of kcRepo running](./demo.gif)
 
 ## Project Structure
 
