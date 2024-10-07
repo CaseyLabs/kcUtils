@@ -1,3 +1,34 @@
-*/data/secrets/*
-# Allow encrypted SOPS files:
-!*/data/secrets/*.enc.*
+#| .gitignore
+#| ---
+#| Files to exclude from git commits
+
+# -- Config files
+# Block .env files as they could contain senstive data
+.env
+
+# -- Output Files
+*~
+*.bak
+*.log
+*.tmp
+*.temp
+
+# -- Caches
+.cache/
+__pycache__/
+
+# -- Languages/Frameworks
+/node_modules/
+/venv/
+
+# -- OS Files
+.DS_Store
+Thumbs.db
+.Trash-*
+
+# -- Logs and Databases
+*.log
+
+# -- Browser Downloads
+*.part
+*.crdownload

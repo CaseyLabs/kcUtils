@@ -1,0 +1,163 @@
+#!/bin/sh
+set -eu
+
+#| Repo Start Script
+#| -----------------
+#| Usage: ./start [option]
+#|
+#| Example: 
+#| ./start build && ./start run
+
+# Note: please keep shell script Posix-compatible for portability.
+
+# -- Init
+
+scriptDependencies="docker"
+configFile="./config/settings.cfg"
+
+export DOCKER_BUILDKIT=1
+
+# Check script dependencies exists
+for thisDepend in $scriptDependencies; do
+  if ! command -v "$thisDepend" >/dev/null 2>&1; then
+    echo "[error] $thisDepend command not found"
+    exit 1
+  fi
+done
+
+# Verify settings.cfg exists
+if [ ! -f "$configFile" ]; then
+  echo "[error] Config file not found: $configFile"
+  exit 1
+fi
+
+# Source the config file
+. "$configFile"
+
+# Check if KC_SERVICE_DOCKERFILE is defined
+if [ -z "${KC_SERVICE_DOCKERFILE:-}" ]; then
+  echo "[error] KC_SERVICE_DOCKERFILE is not defined in $configFile"
+  exit 1
+fi
+
+# Verify Dockerfile exists
+if [ ! -f "$KC_SERVICE_DOCKERFILE" ]; then
+  echo "[error] Dockerfile not found: $KC_SERVICE_DOCKERFILE"
+  exit 1
+fi
+
+# Get KC_CONTAINER vars from settings.cfg, and pass them in as Docker build-arguments (except KC_CONTAINER_FILEMOUNTS)
+get_container_vars() {
+  build_args=""
+  for var in $(set | grep '^KC_CONTAINER_' | cut -d= -f1); do
+    if [ "$var" != "KC_CONTAINER_FILEMOUNTS" ]; then
+      value=$(eval echo \$$var)
+      build_args="$build_args --build-arg $var=$value"
+    fi
+  done
+  echo "$build_args"
+}
+
+# If KC_CONTAINER_FILEMOUNTS is not empty in settings.cfg, pass it in as Docker run volume mount
+get_filemounts() {
+  if [ -n "${KC_CONTAINER_FILEMOUNTS:-}" ]; then
+    echo "$KC_CONTAINER_FILEMOUNTS" | sed '/^$/d' | while read -r mount; do
+      if [ -n "$mount" ]; then
+        echo "-v $mount"
+      fi
+    done
+  fi
+}
+
+#| Options:
+
+#| ./start build: Build the source code in a container image
+build() {
+  echo "Building a Docker image..."
+  build_args=$(get_container_vars)
+  if docker build $build_args -f "$KC_SERVICE_DOCKERFILE" -t "$KC_SERVICE_NAME" .; then
+    echo "[info] Docker Image build finished"
+  else
+    echo "[error] Docker Image build failed."
+    return 1
+  fi
+}
+
+#| ./start rebuild: Rebuild the container image without cached layers
+rebuild() {
+  echo "Rebuilding Docker image without cached layers..."
+  build_args=$(get_container_vars)
+  if docker build --no-cache $build_args -f "$KC_SERVICE_DOCKERFILE" -t "$KC_SERVICE_NAME" .; then
+    echo "[info] Rebuild finished"
+  else
+    echo "[error] Rebuild failed"
+    return 1
+  fi
+}
+
+#| ./start run: Run the built app in a container
+run() {
+  echo "Running the app in a container..."
+  volume_mounts=$(get_filemounts)
+  echo "Debug: Volume mounts: $volume_mounts"
+  if docker run -it --rm $volume_mounts "$KC_SERVICE_NAME"; then
+    echo "[info] Container finished running."
+  else
+    echo "[error] Container failed to run properly."
+    return 1
+  fi
+}
+
+#| ./start shell: Enter a container shell
+shell() {
+  echo "Entering the container shell..."
+  volume_mounts=$(get_filemounts)
+  if docker run -it --rm $volume_mounts "$KC_SERVICE_NAME" /bin/sh; then
+    echo "[info] Shell session finished."
+  else
+    echo "[error] Shell session failed."
+    return 1
+  fi
+}
+
+#| ./start help: Show this help screen
+help() {
+  grep '^#| ' "$0" | sed -e 's/^#| //' | {
+    while IFS= read -r line; do
+      echo "$line"
+    done
+  }
+  exit 0
+}
+
+# -- Script init
+
+# Check if an argument is provided
+if [ $# -eq 0 ]; then
+  echo "Error: No command option provided."
+  echo "Usage: $0 {build|rebuild|shell|run|help}"
+  exit 1
+fi
+
+case "$1" in
+build)
+  build
+  ;;
+rebuild)
+  rebuild
+  ;;
+shell)
+  shell
+  ;;
+run)
+  run
+  ;;
+help)
+  help
+  ;;
+*)
+  echo "Invalid script option: $1"
+  echo "Usage: $0 {build|rebuild|shell|run|help}"
+  exit 1
+  ;;
+esac
