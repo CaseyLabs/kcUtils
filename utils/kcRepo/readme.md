@@ -25,11 +25,11 @@ A flexible, container-driven git repository template for new projects.
 ├── config                      # Config files used during container build
 │   ├── Dockerfile              
 │   ├── install.sh              
+│   ├── run.sh 
 │   ├── settings.cfg            
 │   └── system-packages.cfg     
 │
 ├── src                         # Source code
-│   └── app.sh                  # - main app script (runs in container)
 │
 └── start                       # Repo Start script (Usage: ./start)
 ```
