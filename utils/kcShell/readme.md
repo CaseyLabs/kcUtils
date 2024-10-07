@@ -1,4 +1,4 @@
-# kcShell
+# `kcShell`
 
 A collection of POSIX-compatible shell helper functions, designed to simplify shell script writing.
 
@@ -13,9 +13,23 @@ sudo cp kc /usr/local/bin/
 
 ## Usage  
 
-`kc [command] [args]`  
+`kc [command] [args]`
 
-## Available Functions
+```
+Available commands:
+  log
+  check
+  os
+  edit
+  help
+  version
+```
+
+## Demo
+
+![Image of kcShell running](./demo.gif)
+
+## Script Commands
 
 ### `kc log`
 
@@ -24,7 +38,6 @@ Simple logging function that logs messages to stdout/stderr.
 Usage: `kc log [event type] [event message]`
 
 Example: 
-
 ```
 > kc log info "This is an info message"
 2024-09-20T10:25:36Z | laptop | [info] This is an info message
@@ -36,49 +49,48 @@ Example:
 ### `kc check`
 
 Checks if a file, folder, command, or variable exists.
-
 Usage: `kc check [file/folder/command/variable]`
 
 Examples:
-- `kc check /path/to/file`
-- `kc check /path/to/folder`
-- `kc check commandName`
-- `kc check variableName`
-
 ```
-> kc check UID
-Shell var exists: UID
-
-> kc check pwd
-Command exists: pwd
+kc check /path/to/file
+kc check /path/to/folder
+kc check commandName
+kc check variableName
 ```
 
 ### `kc os`
 
-Commands for Linux system package managers, such as apt, yum, pacman, apk
+Commands for Linux system package managers, such as _apt, yum, pacman, apk_
 
-Usage: `kc os [update/upgrade/install/remove/clean/info]`
+Usage: `kc os [install/remove/clean/info/upgrade]`
 
-Example:
-
+Examples:
 ```
-kc os install curl
+kc os install wget
+kc os install wget curl
+kc os install packages.cfg
+kc os install ./config/packages.cfg
 kc os remove wget
-kc os upgrade # automatic upgrade of all system packages
+kc os info
+kc os upgrade # upgrade all system packages (WARNING: AUTOMATIC, DOES NOT PROMPT!)
 ```
 
 ### `kc edit`
 
-Edits a file (with sudo automatically if neeeded), and saves a backup to `/path/.kcbackup/`
-
-(Default backup retention: 5)
+Edits a file (with sudo automatically if needed) and saves a backup 
+- Files saved in: `./path/to/target/.kc_backups/`
+- Default backup retention: 5 copies
 
 Usage: `kc edit /path/to/file`
+Example: `kc edit /etc/hosts`
 
 ### `kc help`
 
-Displays this help text.
+Shows the available `kc` commands
+Usage: `kc help`
 
-## Demo  
+### `kc version`
 
-![Image of kcShell running](./demo.gif)  
+Prints the current version of kcShell
+Usage: `kc version`
