@@ -6,7 +6,15 @@ Miscellaneous utilities used by Casey Labs.
 
 ### [kcBlog](https://github.com/CaseyLabs/kcUtils/tree/main/utils/kcBlog)
 
-A static HTML generator that converts Markdown files into a simple documentation website. 
+A static HTML generator that converts Markdown files into a simple documentation website.
+
+### [kcCrossScript](https://github.com/CaseyLabs/kcUtils/tree/main/utils/kcCrossScript)
+
+A simple cross-platform script template that will run in any Linux/MacOS terminal shell (`sh/bash/zsh`) or in Windows PowerShell.
+
+### [kcDebugTxt](https://github.com/CaseyLabs/kcUtils/tree/main/utils/kcDebugTxt)
+
+A simple shell script to output the folder structure and file contents of a repository into a single `debug.txt` file, which can then be shared with an AI Chat bot for debugging.
 
 ### [kcDevContainer](https://github.com/CaseyLabs/kcUtils/tree/main/utils/kcDevContainer)
 
