@@ -28,10 +28,10 @@ Current repo layout:
 
 fileName: `main.sh`
 fileContents:
-```bash
+``bash
 #!/bin/bash
 echo "Hello, world!"
-```
+``
 ```
 
 ## Options
