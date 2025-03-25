@@ -17,7 +17,7 @@ The script will generate a `debug.txt` file in the current directory, containing
 
 ## Example Output
 
-```shell
+```
 Current time: Tue Mar 25 12:34:56 PDT 2025
 Let's review the current status of the entire repository, and find any errors or issues.
 
