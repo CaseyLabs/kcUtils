@@ -132,6 +132,32 @@ kc_check() {
   fi
 }
 
+kc_find() {
+  #| ### `kc find`
+  #| Find a file or folder, ignoring case, and highlighting matched items.
+  #| Usage: `kc find [target] [search-word]`
+  #| Examples:
+  #| ```
+  #| kc find / myFile1
+  #| kc find ./src myFile2
+  
+  if [ "$1" = "help" ]; then
+    kc_help "find"
+    return 0
+  fi
+
+  if [ $# -ne 2 ]; then
+    echo ""
+    echo "[error] Incorrect number of arguments." >&2
+    echo 'Run "kc find help" for more info'
+    return 1
+  fi
+
+  local path="$1"
+  local term="$2"
+  /usr/bin/find "$path" 2>/dev/null | grep -i --color=auto "$term"
+}
+
 kc_os() {
   #| ### `kc os`
   #| Commands for Linux system package managers, such as apt, yum, pacman, apk
@@ -213,6 +239,20 @@ kc_os() {
   esac
 
   case "$1" in
+    check)
+      shift
+      if [ "$#" -ne 1 ]; then
+        echo "Usage: kc os check [packageName]"
+        return 1
+      fi
+      if check_package "$1"; then
+        kc_log info "Package $1 is installed"
+        return 0
+      else
+        kc_log info "Package $1 is not installed"
+        return 1
+      fi
+      ;;
     upgrade)
       if ! $sudo sh -c "$upgrade_cmd"; then
         kc_log error "Failed to upgrade system packages"
