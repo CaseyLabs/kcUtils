@@ -1,0 +1,30 @@
+services:
+  # Use './start run' to build and run this service.
+  # Use './start shell' to get a shell inside this service's container.
+  main:
+    build:
+      context: .
+      dockerfile: ./config/Dockerfile
+      args:
+        # Pass the host user's IDs to sync file permissions.
+        # The ':-1001' provides a safe default if the host variables aren't set.
+        APP_UID: ${HOST_UID:-10001}
+        APP_GID: ${HOST_GID:-10001}
+    container_name: "${PROJECT_NAME}"
+    hostname: "${PROJECT_NAME}"
+    tty: true
+    stdin_open: true
+
+  # Use './start test' to run test suite.
+  tester:
+    build:
+      context: .
+      dockerfile: ./config/Dockerfile
+      # Use the 'build' stage as the final image for this service.
+      target: build
+    # Mount the source code directly into the container.
+    # This allows you to re-run tests after code changes without rebuilding the image.
+    volumes:
+      - ./src:/app
+    # The command to run inside the test container, defined in settings.cfg
+    command: ${PROJECT_TEST_COMMAND}

@@ -1,5 +1,3 @@
-#| .gitignore
-#| ---
 #| Files to exclude from git commits
 
 # -- Config files
@@ -32,3 +30,6 @@ Thumbs.db
 # -- Browser Downloads
 *.part
 *.crdownload
+
+# -- Visual Studio Code
+.vscode/

@@ -1,163 +1,151 @@
 #!/bin/sh
-set -eu
+set -e
 
-#| Repo Start Script
-#| -----------------
-#| Usage: ./start [option]
-#|
-#| Example: 
-#| ./start build && ./start run
+# ==================================================================
+# Repo Start Script
+# -----------------
+# Builds and runs the ./src files in a Docker container
+# ==================================================================
 
-# Note: please keep shell script Posix-compatible for portability.
+# Update the ./config/settings.cfg file with your project's settings
+set -a
+. ./config/settings.cfg
+set +a
 
-# -- Init
+# ==================================================================
+# SCRIPT BUILD COMMANDS
+# ==================================================================
 
-scriptDependencies="docker"
-configFile="./config/settings.cfg"
+# Determine the script's directory and project root
+SCRIPT_DIR=$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)
+PROJECT_ROOT=$(cd -- "$SCRIPT_DIR" && pwd)
 
-export DOCKER_BUILDKIT=1
+dockerComposeCmd="docker compose --project-directory . -f ${PROJECT_ROOT}/config/docker-compose.yml"
+dockerComposeServiceName="main"  # We will build the "main" service defined in docker-compose.yml
 
-# Check script dependencies exists
-for thisDepend in $scriptDependencies; do
-  if ! command -v "$thisDepend" >/dev/null 2>&1; then
-    echo "[error] $thisDepend command not found"
-    exit 1
+# Define all your project's build commands in this block.
+COMMANDS="
+build: Builds the Docker image for the project.
+  ${dockerComposeCmd} build ${dockerComposeServiceName}
+
+rebuild: Builds a clean Docker image from scratch.
+  ${dockerComposeCmd} build --no-cache ${dockerComposeServiceName}
+
+run: Runs the main application in a detached container.
+  ${dockerComposeCmd} up --remove-orphans ${dockerComposeServiceName}
+
+shell: Starts a shell, attaching to the running project container or creating a new one.
+  # First, check if the service is already running. We query by SERVICE name.
+  CONTAINER_ID=\$(${dockerComposeCmd} ps -q ${dockerComposeServiceName} || true)
+  # If CONTAINER_ID is not empty, a container is running. Attach to it.
+  if [ -n \"\$CONTAINER_ID\" ]; then
+    echo \"==> Found running project container. Attaching shell...\"
+    docker exec -it \"\$CONTAINER_ID\" /bin/sh
+  else
+    echo \"==> No running container found. Starting a new one for a shell session...\"
+  # Use 'run' with the --entrypoint flag to start a NEW container with a shell.
+    ${dockerComposeCmd} run --rm --entrypoint /bin/sh ${dockerComposeServiceName}
   fi
-done
 
-# Verify settings.cfg exists
-if [ ! -f "$configFile" ]; then
-  echo "[error] Config file not found: $configFile"
-  exit 1
-fi
+stop: Stops and removes the running app container.
+  ${dockerComposeCmd} down
 
-# Source the config file
-. "$configFile"
+test: Runs the project's test suite in a clean, temporary container.
+   ${dockerComposeCmd} run --rm tester
 
-# Check if KC_SERVICE_DOCKERFILE is defined
-if [ -z "${KC_SERVICE_DOCKERFILE:-}" ]; then
-  echo "[error] KC_SERVICE_DOCKERFILE is not defined in $configFile"
-  exit 1
-fi
+clean: Stops containers and removes all related data (images, volumes).
+  ${dockerComposeCmd} down -v --remove-orphans
+"
 
-# Verify Dockerfile exists
-if [ ! -f "$KC_SERVICE_DOCKERFILE" ]; then
-  echo "[error] Dockerfile not found: $KC_SERVICE_DOCKERFILE"
-  exit 1
-fi
+# Help Text Examples: Define a few common use-cases for your script.
+EXAMPLES="
+  Build and run the application for the first time:
+    ./start build && ./start run
+"
 
-# Get KC_CONTAINER vars from settings.cfg, and pass them in as Docker build-arguments (except KC_CONTAINER_FILEMOUNTS)
-get_container_vars() {
-  build_args=""
-  for var in $(set | grep '^KC_CONTAINER_' | cut -d= -f1); do
-    if [ "$var" != "KC_CONTAINER_FILEMOUNTS" ]; then
-      value=$(eval echo \$$var)
-      build_args="$build_args --build-arg $var=$value"
+# ==================================================================
+# SCRIPT ENGINE
+# ==================================================================
+# You shouldn't need to edit anything below this line.
+
+# Logging
+logmsg() {
+  local eventType="$1"
+  local eventMessage="$2"
+  if [ "$VERBOSE_LOGGING" = "true" ]; then
+    local timestamp
+    timestamp=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
+    printf "%s | %s | [%s] %s\n" "$timestamp" "$PROJECT_NAME" "$eventType" "$eventMessage"
+  else
+    if [ "$eventType" = "error" ]; then
+      printf "[ERROR] %s\n" "$eventMessage" >&2
+    else
+      printf "==> %s\n" "$eventMessage"
     fi
-  done
-  echo "$build_args"
-}
-
-# If KC_CONTAINER_FILEMOUNTS is not empty in settings.cfg, pass it in as Docker run volume mount
-get_filemounts() {
-  if [ -n "${KC_CONTAINER_FILEMOUNTS:-}" ]; then
-    echo "$KC_CONTAINER_FILEMOUNTS" | sed '/^$/d' | while read -r mount; do
-      if [ -n "$mount" ]; then
-        echo "-v $mount"
-      fi
-    done
+  fi
+  if command -v logger > /dev/null 2>&1; then
+    local tag="$PROJECT_NAME/$(basename "$0")"
+    local priority="user.info"
+    [ "$eventType" = "error" ] && priority="user.error"
+    logger -t "$tag" -p "$priority" -- "$eventMessage"
   fi
 }
 
-#| Options:
-
-#| ./start build: Build the source code in a container image
-build() {
-  echo "Building a Docker image..."
-  build_args=$(get_container_vars)
-  if docker build $build_args -f "$KC_SERVICE_DOCKERFILE" -t "$KC_SERVICE_NAME" .; then
-    echo "[info] Docker Image build finished"
-  else
-    echo "[error] Docker Image build failed."
-    return 1
-  fi
-}
-
-#| ./start rebuild: Rebuild the container image without cached layers
-rebuild() {
-  echo "Rebuilding Docker image without cached layers..."
-  build_args=$(get_container_vars)
-  if docker build --no-cache $build_args -f "$KC_SERVICE_DOCKERFILE" -t "$KC_SERVICE_NAME" .; then
-    echo "[info] Rebuild finished"
-  else
-    echo "[error] Rebuild failed"
-    return 1
-  fi
-}
-
-#| ./start run: Run the built app in a container
-run() {
-  echo "Running the app in a container..."
-  volume_mounts=$(get_filemounts)
-  echo "Debug: Volume mounts: $volume_mounts"
-  if docker run -it --rm $volume_mounts "$KC_SERVICE_NAME"; then
-    echo "[info] Container finished running."
-  else
-    echo "[error] Container failed to run properly."
-    return 1
-  fi
-}
-
-#| ./start shell: Enter a container shell
-shell() {
-  echo "Entering the container shell..."
-  volume_mounts=$(get_filemounts)
-  if docker run -it --rm $volume_mounts "$KC_SERVICE_NAME" /bin/sh; then
-    echo "[info] Shell session finished."
-  else
-    echo "[error] Shell session failed."
-    return 1
-  fi
-}
-
-#| ./start help: Show this help screen
+# Help Text
 help() {
-  grep '^#| ' "$0" | sed -e 's/^#| //' | {
-    while IFS= read -r line; do
-      echo "$line"
+  printf "Usage: ./%s {command}\n\n" "$(basename "$0")"
+  printf "Commands:\n"
+  max_width=$(printf "%s\n" "$COMMANDS" | grep -E '^[a-zA-Z0-9_-]+:' | sed 's/:.*$//' | awk '{print length}' | sort -n | tail -1)
+  [ "$max_width" -lt 4 ] && max_width=4
+  max_width=$((max_width + 2))
+  printf "%s\n" "$COMMANDS" | grep -E '^[a-zA-Z0-9_-]+:' | sed -e 's/^\([^:]*\): \(.*\)/\1|\2/' | sort | \
+    while IFS='|' read -r cmd desc; do
+      printf "  %-*s - %s\n" "$max_width" "$cmd" "$desc"
     done
-  }
+  printf "  %-*s - %s\n" "$max_width" "help" "Shows this help message."
+  if [ -n "$EXAMPLES" ]; then
+    printf "\nExamples:\n"
+    printf "%s\n" "$EXAMPLES"
+  fi
   exit 0
 }
 
-# -- Script init
+# Command Runner
+run_command() {
+  local cmd_name="$1"
+  if [ -z "$cmd_name" ] || [ "$cmd_name" = "help" ]; then
+    help
+  fi
+  local cmd_desc=$(printf "%s" "$COMMANDS" | grep "^$cmd_name:" | sed "s/^$cmd_name: //")
+  local cmd_script=$(printf "%s" "$COMMANDS" | sed -n "/^$cmd_name:/,/^[a-zA-Z0-9_-]*:\|^$/{/^$cmd_name:/d; p;}" | sed 's/^[ \t]*//')
+  if [ -z "$cmd_script" ]; then
+    logmsg error "Command '$cmd_name' is not defined." && help >&2 && exit 1
+  fi
+  logmsg info "Running command: $cmd_name..."
+  [ "$VERBOSE_LOGGING" = "false" ] && [ -n "$cmd_desc" ] && logmsg info "$cmd_desc"
+  if sh -c "$cmd_script"; then
+    logmsg info "Finished: $cmd_name"
+  else
+    logmsg error "Command failed: $cmd_name"
+    exit 1
+  fi
+}
 
-# Check if an argument is provided
-if [ $# -eq 0 ]; then
-  echo "Error: No command option provided."
-  echo "Usage: $0 {build|rebuild|shell|run|help}"
-  exit 1
+# Script Requirements Check
+for dep in docker; do
+    if ! command -v "$dep" > /dev/null 2>&1; then
+        logmsg error "Required command '$dep' is not installed. Please install it to continue."
+        exit 1
+    fi
+done
+if ! docker compose version > /dev/null 2>&1; then
+    logmsg error "'docker compose' command not found. Please ensure Docker Compose V2 is installed."
+    exit 1
 fi
 
-case "$1" in
-build)
-  build
-  ;;
-rebuild)
-  rebuild
-  ;;
-shell)
-  shell
-  ;;
-run)
-  run
-  ;;
-help)
-  help
-  ;;
-*)
-  echo "Invalid script option: $1"
-  echo "Usage: $0 {build|rebuild|shell|run|help}"
-  exit 1
-  ;;
-esac
+# Pass standard variables to Docker Compose
+export HOST_UID=$(id -u)
+export HOST_GID=$(id -g)
+
+# Script Entrypoint
+run_command "$1"
