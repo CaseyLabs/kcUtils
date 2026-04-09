@@ -24,9 +24,9 @@ A portable, standardized Docker development environment container.
 
 A simple README generator for source code documentation, generated from comments within your code. 
 
-### [kcRepo](https://github.com/CaseyLabs/kcUtils/tree/main/utils/kcRepo)
+### [kcRepoScanner](https://github.com/CaseyLabs/kcUtils/tree/main/utils/kcRepoScanner)
 
-A git repository template for new projects.
+A Docker-based security and vulnerability scanner for Git Repositories.
 
 ### [kcShell](https://github.com/CaseyLabs/kcUtils/tree/main/utils/kcShell)
 
