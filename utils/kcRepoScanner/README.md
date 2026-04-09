@@ -14,15 +14,22 @@ A small Docker-based utility for scanning any local Git repository with one port
 From this project directory:
 
 ```sh
-make scan
+make scan TARGET=/path/to/your/repo
 ```
 
-That builds the scanner image and runs it against this project directory by default.
+That builds the scanner image and runs it against the target directory.
 
-To scan a different local repository:
+## Quick Setup
 
 ```sh
-make scan TARGET=/absolute/path/to/repo
+# Set target repo on your system
+myRepo="${HOME}/git/path/to/repo"
+
+# Clone just this directory
+git clone --depth=1 --filter=blob:none --sparse https://github.com/CaseyLabs/kcUtils.git kcTmp && cd kcTmp && git sparse-checkout set utils/kcRepoScanner && mv utils/kcRepoScanner ../kcRepoScanner && cd .. && rm -rf kcTmp && cd kcRepoScanner
+
+# Run the security scan
+make scan TARGET="${myRepo}"
 ```
 
 ## Useful Commands
@@ -30,8 +37,8 @@ make scan TARGET=/absolute/path/to/repo
 ```sh
 make build
 make scan
-make scan TARGET=/home/user/git/tmp/numa-fork
-make scan-json TARGET=/home/user/git/tmp/numa-fork
+make scan TARGET=/path/to/your/repo
+make scan-json TARGET=/path/to/your/repo
 make clean
 ```
 
