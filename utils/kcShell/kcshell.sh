@@ -1,23 +1,25 @@
 #!/bin/sh
+# shellcheck disable=SC2329
 
 #| `kcShell`
 #| A collection of POSIX-compatible shell helper functions, designed to simplify shell script writing.
 
-#| ## Install  
-#|   
+#| ## Install
+#|
 #| ```sh
 #| kcScriptUrl="https://raw.githubusercontent.com/CaseyLabs/kcUtils/main/utils/kcShell/kcshell.sh"
 #| curl -s ${kcScriptUrl} > kc
 #| chmod +x kc
 #| sudo cp kc /usr/local/bin/
-#| ```    
-#|   
-#| ## Usage  
-#| `kc [command] [args]`  
-#| 
+#| ```
+#|
+#| ## Usage
+#| `kc [command] [args]`
+#|
 #| Available commands:
 #|   log
 #|   check
+#|   find
 #|   os
 #|   edit
 #|   help
@@ -31,10 +33,10 @@ kcScriptVersion="v24.10.06"
 # -- Vars
 
 # Detect the OS and architecture
-kcShell=${0##*/}
 kcOS=$(grep '^ID=' /etc/os-release | cut -f2 -d'=' 2>/dev/null || uname)
 kcOSLIKE=$(grep '^ID_LIKE=' /etc/os-release | cut -f2 -d'=' 2>/dev/null || uname)
 kcArch=$(uname -m)
+kcHost=$(uname -n 2>/dev/null || hostname 2>/dev/null || printf "unknown")
 
 # Check if we are root
 if [ "$(id -u)" -ne 0 ]; then
@@ -43,21 +45,37 @@ else
   sudo=""
 fi
 
+run_as_root() {
+  if [ -n "$sudo" ]; then
+    "$sudo" "$@"
+  else
+    "$@"
+  fi
+}
+
+run_as_root_if_needed() {
+  if [ -n "$sudo" ] && "$sudo" -n true 2>/dev/null; then
+    "$sudo" "$@"
+  else
+    "$@"
+  fi
+}
+
 #| ## Available Functions
 
 kc_log() {
   #| ### `kc log`
   #| Simple logging function that logs messages to stdout/stderr.
   #| Usage: `kc log [event type] [event message]`
-  #| Example: 
+  #| Example:
   #| ```
   #| > kc log info "This is an info message"
   #| 2024-09-20T10:25:36Z | laptop | [info] This is an info message
-  #| 
+  #|
   #| > kc log error "This is an error message that goes to stderr"
   #| 2024-09-20T10:25:36Z | laptop | [error] This is an error message that goes to stderr
   #| ```
-  
+
   if [ "$1" = "help" ]; then
     kc_help "log"
     return 0
@@ -69,12 +87,12 @@ kc_log() {
     echo "Run 'kc log help' for more info"
     return 1
   fi
-  
+
   timestamp=$(date +"%Y-%m-%dT%H:%M:%SZ")
   eventType=$(echo "$1" | tr '[:upper:]' '[:lower:]')
   eventMessage="$2"
 
-  logPrefix="$timestamp | $HOSTNAME | [$eventType]"
+  logPrefix="$timestamp | $kcHost | [$eventType]"
 
   case "$eventType" in
     debug)
@@ -84,7 +102,7 @@ kc_log() {
     error)
       echo "$logPrefix $eventMessage" >&2
       ;;
-    info|warning)
+    info | warning)
       echo "$logPrefix $eventMessage"
       ;;
     *)
@@ -104,7 +122,7 @@ kc_check() {
   #| kc check commandName
   #| kc check variableName
   #| ```
-  
+
   if [ "$1" = "help" ]; then
     kc_help "check"
     return 0
@@ -140,7 +158,8 @@ kc_find() {
   #| ```
   #| kc find / myFile1
   #| kc find ./src myFile2
-  
+  #| ```
+
   if [ "$1" = "help" ]; then
     kc_help "find"
     return 0
@@ -153,15 +172,15 @@ kc_find() {
     return 1
   fi
 
-  local path="$1"
-  local term="$2"
-  /usr/bin/find "$path" 2>/dev/null | grep -i --color=auto "$term"
+  find_path=$1
+  find_term=$2
+  find "$find_path" 2>/dev/null | grep -i --color=auto "$find_term"
 }
 
 kc_os() {
   #| ### `kc os`
   #| Commands for Linux system package managers, such as apt, yum, pacman, apk
-  #| Usage: kc os [install/remove/clean/info/upgrade]
+  #| Usage: kc os [install/remove/clean/info/upgrade/check]
   #| Examples:
   #| ```
   #| kc os install wget
@@ -169,6 +188,7 @@ kc_os() {
   #| kc os install packages.cfg
   #| kc os install ./config/packages.cfg
   #| kc os remove wget
+  #| kc os check wget
   #| kc os info
   #| kc os upgrade # upgrade all system packages (WARNING: AUTOMATIC, DOES NOT PROMPT!)
   #| ```
@@ -186,18 +206,18 @@ kc_os() {
   fi
 
   check_package() {
-    local package=$1
+    package=$1
     case "${kcOS}|${kcOSLIKE}" in
-      *ubuntu*|*debian*)
+      *ubuntu* | *debian*)
         dpkg-query -W -f='${Status}' "$package" 2>/dev/null | grep -q "ok installed"
         ;;
-      *centos*|*rhel*|*fedora*|*amazon*)
+      *centos* | *rhel* | *fedora* | *amazon*)
         rpm -q "$package" >/dev/null 2>&1
         ;;
       *alpine*)
         apk info -e "$package" >/dev/null 2>&1
         ;;
-      *arch*|*manjaro*|*cachyos*)
+      *arch* | *manjaro* | *cachyos*)
         pacman -Qi "$package" >/dev/null 2>&1
         ;;
       *)
@@ -206,32 +226,82 @@ kc_os() {
     esac
   }
 
+  install_packages() {
+    case "${kcOS}|${kcOSLIKE}" in
+      *ubuntu* | *debian*)
+        export DEBIAN_FRONTEND=noninteractive
+        run_as_root apt-get install -y "$@"
+        ;;
+      *centos* | *rhel* | *fedora* | *amazon*)
+        run_as_root yum install -y "$@"
+        ;;
+      *alpine*)
+        run_as_root apk add "$@"
+        ;;
+      *arch* | *manjaro* | *cachyos*)
+        run_as_root pacman -S --noconfirm "$@"
+        ;;
+    esac
+  }
+
+  remove_packages() {
+    case "${kcOS}|${kcOSLIKE}" in
+      *ubuntu* | *debian*)
+        run_as_root apt-get remove -y "$@"
+        ;;
+      *centos* | *rhel* | *fedora* | *amazon*)
+        run_as_root yum remove -y "$@"
+        ;;
+      *alpine*)
+        run_as_root apk del "$@"
+        ;;
+      *arch* | *manjaro* | *cachyos*)
+        run_as_root pacman -R --noconfirm "$@"
+        ;;
+    esac
+  }
+
+  upgrade_packages() {
+    case "${kcOS}|${kcOSLIKE}" in
+      *ubuntu* | *debian*)
+        export DEBIAN_FRONTEND=noninteractive
+        run_as_root apt-get update
+        run_as_root apt-get upgrade -y
+        ;;
+      *centos* | *rhel* | *fedora* | *amazon*)
+        run_as_root yum upgrade -y
+        ;;
+      *alpine*)
+        run_as_root apk update
+        run_as_root apk upgrade
+        ;;
+      *arch* | *manjaro* | *cachyos*)
+        run_as_root pacman -Syu --noconfirm
+        ;;
+    esac
+  }
+
+  clean_packages() {
+    case "${kcOS}|${kcOSLIKE}" in
+      *ubuntu* | *debian*)
+        export DEBIAN_FRONTEND=noninteractive
+        run_as_root apt-get clean
+        run_as_root apt-get autoremove -y
+        ;;
+      *centos* | *rhel* | *fedora* | *amazon*)
+        run_as_root yum clean all
+        ;;
+      *alpine*)
+        run_as_root apk cache clean
+        ;;
+      *arch* | *manjaro* | *cachyos*)
+        run_as_root pacman -Sc --noconfirm
+        ;;
+    esac
+  }
+
   case "${kcOS}|${kcOSLIKE}" in
-    *ubuntu*|*debian*)
-      export DEBIAN_FRONTEND=noninteractive
-      install_cmd="apt-get install -y"
-      remove_cmd="apt-get remove -y"
-      upgrade_cmd="apt-get update && apt-get upgrade -y"
-      clean_cmd="apt-get clean && apt-get autoremove -y"
-      ;;
-    *centos*|*rhel*|*fedora*|*amazon*)
-      install_cmd="yum install -y"
-      remove_cmd="yum remove -y"
-      upgrade_cmd="yum upgrade -y"
-      clean_cmd="yum clean all"
-      ;;
-    *alpine*)
-      install_cmd="apk add"
-      remove_cmd="apk del"
-      upgrade_cmd="apk update && apk upgrade"
-      clean_cmd="apk cache clean"
-      ;;
-    *arch*|*manjaro*|*cachyos*)
-      install_cmd="pacman -S --noconfirm"
-      remove_cmd="pacman -R --noconfirm"
-      upgrade_cmd="pacman -Syu --noconfirm"
-      clean_cmd="pacman -Sc --noconfirm"
-      ;;
+    *ubuntu* | *debian* | *centos* | *rhel* | *fedora* | *amazon* | *alpine* | *arch* | *manjaro* | *cachyos*) ;;
     *)
       printf "Unsupported operating system: %s\n" "$kcOS"
       return 1
@@ -254,7 +324,7 @@ kc_os() {
       fi
       ;;
     upgrade)
-      if ! $sudo sh -c "$upgrade_cmd"; then
+      if ! upgrade_packages; then
         kc_log error "Failed to upgrade system packages"
         return 1
       fi
@@ -265,40 +335,52 @@ kc_os() {
         echo "Usage: kc os install [package...] or [config_file]"
         return 1
       fi
-      
-      packages_to_install=""
+
+      package_file=$(mktemp) || return 1
+      sorted_package_file=$(mktemp) || {
+        rm -f "$package_file"
+        return 1
+      }
+
       for arg in "$@"; do
         if [ -f "$arg" ]; then
           # Read packages from file, ignoring comments and empty lines
           file_packages=$(grep -v '^\s*#' "$arg" | grep -v '^\s*$' | tr '\n' ' ')
           for pkg in $file_packages; do
             if ! check_package "$pkg"; then
-              packages_to_install="$packages_to_install $pkg"
+              printf "%s\n" "$pkg" >>"$package_file"
             else
               kc_log info "Package $pkg is already installed, skipping."
             fi
           done
         else
           if ! check_package "$arg"; then
-            packages_to_install="$packages_to_install $arg"
+            printf "%s\n" "$arg" >>"$package_file"
           else
             kc_log info "Package $arg is already installed, skipping."
           fi
         fi
       done
-      
-      # Trim leading/trailing whitespace and remove duplicate packages
-      packages_to_install=$(echo "$packages_to_install" | xargs -n1 | sort -u | xargs)
-      
-      if [ -n "$packages_to_install" ]; then
+
+      sort -u "$package_file" >"$sorted_package_file"
+
+      if [ -s "$sorted_package_file" ]; then
+        set --
+        while IFS= read -r pkg; do
+          [ -n "$pkg" ] && set -- "$@" "$pkg"
+        done <"$sorted_package_file"
+
+        packages_to_install=$(tr '\n' ' ' <"$sorted_package_file" | sed 's/[[:space:]]*$//')
         kc_log info "Installing packages: $packages_to_install"
-        if ! $sudo sh -c "$install_cmd $packages_to_install"; then
+        if ! install_packages "$@"; then
           kc_log error "Failed to install packages: $packages_to_install"
+          rm -f "$package_file" "$sorted_package_file"
           return 1
         fi
       else
         kc_log info "No new packages to install."
       fi
+      rm -f "$package_file" "$sorted_package_file"
       ;;
     remove)
       shift
@@ -306,13 +388,13 @@ kc_os() {
         echo "Usage: kc os remove [package...]"
         return 1
       fi
-      if ! $sudo $remove_cmd "$@"; then
+      if ! remove_packages "$@"; then
         kc_log error "Failed to remove packages: $*"
         return 1
       fi
       ;;
     clean)
-      if ! $sudo sh -c "$clean_cmd"; then
+      if ! clean_packages; then
         kc_log error "Failed to clean package manager cache"
         return 1
       fi
@@ -326,17 +408,17 @@ kc_os() {
       printf "Unknown command: %s\n" "$1"
       return 1
       ;;
-  esac 
+  esac
 }
 
 kc_edit() {
   #| ### `kc edit`
-  #| Edits a file (with sudo automatically if needed) and saves a backup 
+  #| Edits a file (with sudo automatically if needed) and saves a backup
   #| Files saved in: `./path/to/target/.kc_backups/`
   #| (Default backup retention: 5)
   #| Usage: `kc edit /path/to/file`
   #| Example: `kc edit /etc/hosts`
-  
+
   if [ "$1" = "help" ]; then
     kc_help "edit"
     return 0
@@ -350,43 +432,37 @@ kc_edit() {
   fi
 
   backup_limit=5
+  target_basename=$(basename "$1")
 
   # Use a more portable method to get the absolute path
-  abs_path=$(cd "$(dirname "$1")" && pwd -P)/$(basename "$1")
+  abs_path=$(cd "$(dirname "$1")" && pwd -P)/$target_basename
 
-  if [ ! -r "$abs_path" ] && ! $sudo test -r "$abs_path"; then
+  if [ ! -r "$abs_path" ] && ! run_as_root_if_needed test -r "$abs_path"; then
     kc_log error "File does not exist or is not readable: $abs_path"
     return 1
   fi
 
   backup_dir="${abs_path%/*}/.kc_backups"
-  run_with_sudo() {
-    if $sudo -n true 2>/dev/null; then
-      $sudo "$@"
-    else
-      "$@"
-    fi
-  }
 
   # Ensure backup directory exists with proper permissions
   if [ ! -d "$backup_dir" ]; then
-    if ! run_with_sudo mkdir -p "$backup_dir"; then
+    if ! run_as_root_if_needed mkdir -p "$backup_dir"; then
       kc_log error "Failed to create backup directory: $backup_dir"
       return 1
     fi
-    run_with_sudo chmod 700 "$backup_dir"
+    run_as_root_if_needed chmod 700 "$backup_dir"
   fi
 
   # Create a temporary backup before editing
-  temp_backup="$backup_dir/$(basename "$abs_path").temp"
-  if ! run_with_sudo cp -a "$abs_path" "$temp_backup"; then
+  temp_backup="$backup_dir/$target_basename.temp"
+  if ! run_as_root_if_needed cp -a "$abs_path" "$temp_backup"; then
     kc_log error "Failed to create temporary backup: $temp_backup"
     return 1
   fi
 
   # Edit file
   editor="${EDITOR:-$(command -v nano || command -v vi)}"
-  if ! run_with_sudo "$editor" "$abs_path"; then
+  if ! run_as_root_if_needed "$editor" "$abs_path"; then
     kc_log error "Failed to edit file: $abs_path"
     return 1
   fi
@@ -394,18 +470,23 @@ kc_edit() {
   # Check if the file has changed and move the temp backup if so
   if ! cmp -s "$abs_path" "$temp_backup"; then
     timestamp=$(date +%s)
-    backup_file="$backup_dir/$(basename "$abs_path").$timestamp"
-    if run_with_sudo mv "$temp_backup" "$backup_file"; then
+    backup_file="$backup_dir/$target_basename.$timestamp"
+    if run_as_root_if_needed mv "$temp_backup" "$backup_file"; then
       kc_log info "Backup created: $backup_file"
     else
       kc_log error "Failed to create backup: $backup_file"
     fi
   else
-    run_with_sudo rm "$temp_backup"  # Remove temp backup if no changes
+    run_as_root_if_needed rm "$temp_backup" # Remove temp backup if no changes
   fi
 
   # Cleanup old backups
-  find "$backup_dir" -name "$(basename "$abs_path").*" -type f | sort -r | tail -n +$((backup_limit+1)) | xargs -r run_with_sudo rm
+  find "$backup_dir" -name "$target_basename.*" -type f |
+    sort -r |
+    tail -n +"$((backup_limit + 1))" |
+    while IFS= read -r old_backup; do
+      [ -n "$old_backup" ] && run_as_root_if_needed rm "$old_backup"
+    done
 }
 
 kc_help() {
@@ -415,10 +496,10 @@ kc_help() {
   if [ -n "$1" ]; then
     if command -v "kc_$1" >/dev/null 2>&1; then
       printf "Help for 'kc %s':\n" "$1"
-      sed -n "/^kc_$1()/,/^}/p" "$0" | 
-        grep -E '^  #\|' | 
+      sed -n "/^kc_$1()/,/^}/p" "$0" |
+        grep -E '^  #\|' |
         sed -E 's/^  #\| ?//' |
-        sed -E 's/^### `kc [a-z]+`//' |
+        sed -E 's/^### .kc [a-z]+.//' |
         sed -E 's/`//g' |
         awk '{
           if ($0 ~ /^Usage:/) print $0;
@@ -463,12 +544,6 @@ case "$1" in
     ;;
   version)
     kc_version
-    ;;
-  update)
-    kc_update
-    ;;
-  list)
-    kc_list
     ;;
   *)
     if command -v "kc_$1" >/dev/null 2>&1; then

@@ -2,16 +2,16 @@
 
 A collection of POSIX-compatible shell helper functions, designed to simplify shell script writing.
 
-## Install  
+## Install
 
 ```sh
 kcScriptUrl="https://raw.githubusercontent.com/CaseyLabs/kcUtils/main/utils/kcShell/kcshell.sh"
-curl -s ${kcScriptUrl} > kc
+curl -s "$kcScriptUrl" > kc
 chmod +x kc
 sudo cp kc /usr/local/bin/
-```    
+```
 
-## Usage  
+## Usage
 
 `kc [command] [args]`
 
@@ -19,6 +19,7 @@ sudo cp kc /usr/local/bin/
 Available commands:
   log
   check
+  find
   os
   edit
   help
@@ -49,6 +50,7 @@ Example:
 ### `kc check`
 
 Checks if a file, folder, command, or variable exists.
+
 Usage: `kc check [file/folder/command/variable]`
 
 Examples:
@@ -59,11 +61,23 @@ kc check commandName
 kc check variableName
 ```
 
+### `kc find`
+
+Finds a file or folder, ignoring case, and highlights matched items.
+
+Usage: `kc find [target] [search-word]`
+
+Examples:
+```
+kc find / myFile1
+kc find ./src myFile2
+```
+
 ### `kc os`
 
 Commands for Linux system package managers, such as _apt, yum, pacman, apk_
 
-Usage: `kc os [install/remove/clean/info/upgrade]`
+Usage: `kc os [install/remove/clean/info/upgrade/check]`
 
 Examples:
 ```
@@ -72,25 +86,30 @@ kc os install wget curl
 kc os install packages.cfg
 kc os install ./config/packages.cfg
 kc os remove wget
+kc os check wget
 kc os info
 kc os upgrade # upgrade all system packages (WARNING: AUTOMATIC, DOES NOT PROMPT!)
 ```
 
 ### `kc edit`
 
-Edits a file (with sudo automatically if needed) and saves a backup 
+Edits a file (with sudo automatically if needed) and saves a backup.
+
 - Files saved in: `./path/to/target/.kc_backups/`
 - Default backup retention: 5 copies
 
 Usage: `kc edit /path/to/file`
+
 Example: `kc edit /etc/hosts`
 
 ### `kc help`
 
 Shows the available `kc` commands
+
 Usage: `kc help`
 
 ### `kc version`
 
 Prints the current version of kcShell
+
 Usage: `kc version`
