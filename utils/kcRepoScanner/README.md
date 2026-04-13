@@ -55,7 +55,7 @@ make clean
 You can override scanner settings directly with `docker run` if needed:
 
 ```sh
-docker build -f Dockerfile.scan -t kc-repo-scanner:local .
+docker build -t kc-repo-scanner:local .
 
 docker run --rm \
   --mount type=bind,src="/path/to/repo",dst=/repo,readonly \

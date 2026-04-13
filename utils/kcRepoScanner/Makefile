@@ -1,6 +1,6 @@
 IMAGE ?= kc-repo-scanner:local
 TARGET ?= $(CURDIR)
-DOCKERFILE ?= Dockerfile.scan
+DOCKERFILE ?= Dockerfile
 
 .PHONY: help build scan scan-json clean check-docker check-target
 

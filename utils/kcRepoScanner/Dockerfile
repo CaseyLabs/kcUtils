@@ -3,7 +3,7 @@
 # Portable local repository scanner.
 #
 # Copy this file into another Git repository and build it there:
-#   docker build -f Dockerfile.scan -t repo-scan:local .
+#   docker build -t repo-scan:local .
 #
 # Run it against the current checkout:
 #   docker run --rm \
@@ -11,7 +11,7 @@
 #     repo-scan:local
 #
 # All-in-one quick start from the target repository root:
-#   docker build -f Dockerfile.scan -t repo-scan:local . && \
+#   docker build -t repo-scan:local . && \
 #   docker run --rm --mount type=bind,src="$(pwd)",dst=/repo,readonly repo-scan:local
 #
 # Common runtime options:

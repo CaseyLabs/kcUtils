@@ -1,6 +1,6 @@
 # syntax=docker/dockerfile:1
 
-#| # `kcBlog/dockerfile` 
+#| # `kcBlog/Dockerfile`
 #|
 #| This Dockerfile is used to build a Python image that runs the app as a non-root user.
 
