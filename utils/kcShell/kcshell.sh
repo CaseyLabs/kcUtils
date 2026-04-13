@@ -197,7 +197,7 @@ kc_os() {
       *alpine*)
         apk info -e "$package" >/dev/null 2>&1
         ;;
-      *arch*|*manjaro*)
+      *arch*|*manjaro*|*cachyos*)
         pacman -Qi "$package" >/dev/null 2>&1
         ;;
       *)
@@ -226,7 +226,7 @@ kc_os() {
       upgrade_cmd="apk update && apk upgrade"
       clean_cmd="apk cache clean"
       ;;
-    *arch*|*manjaro*)
+    *arch*|*manjaro*|*cachyos*)
       install_cmd="pacman -S --noconfirm"
       remove_cmd="pacman -R --noconfirm"
       upgrade_cmd="pacman -Syu --noconfirm"
