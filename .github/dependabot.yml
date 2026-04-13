@@ -13,14 +13,14 @@ updates:
       prefix: "[dependabot]"
       # Include the dependency scope in the title/message when possible.
       include: "scope"
-    # Group multiple lower-risk updates into a single PR
+    # Group GitHub Actions updates into a single PR.
     # - This reduces the number of Dependabot PRs you have to review.
-    # - Major updates stay separate, as they are more likely to introduce breaking changes and deserve their own review.
     groups:
-      minor-and-patch:
+      actions:
         patterns:
           - "*"
         update-types:
+          - "major"
           - "minor"
           - "patch"
 
