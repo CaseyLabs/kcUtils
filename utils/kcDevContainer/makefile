@@ -1,42 +1,43 @@
-#| # kcDevContainer
-#|   
-#| `kcDevContainer` is standardized Docker development environment container.   
-#|   
-#| ## Setup  
-#|   
-#| ```sh
-#| make build
-#| ```  
-#|   
-#| ## Usage  
-#|
-#| Run and enter the container's shell:
-#|
-#| ```sh
-#| make run
-#| ```  
-#|
-#| ## Example
-#| ![kcDevContainer demo image](./demo.gif)
-
-ENVFILE = ./config/settings.env
+ENVFILE ?= ./config/settings.env
 include $(ENVFILE)
 export $(shell sed '/^\#/d; s/=.*//' $(ENVFILE))
 
-# Available Makefile stages
-.PHONY: build run
+IMAGE ?= $(kcServiceName)
+WORKDIR ?= $(CURDIR)
 
-#| ## Setup
+.PHONY: help check-docker check build cached-build run shell clean
 
-#| - `make build`: Build the app
-build:
-	docker build --no-cache -t ${kcServiceName} .
+help:
+	@printf '%s\n' 'Targets:'
+	@printf '%s\n' '  make build         Build the dev container without cache'
+	@printf '%s\n' '  make cached-build  Build the dev container with cache'
+	@printf '%s\n' '  make run           Build with cache and enter zsh'
+	@printf '%s\n' '  make shell         Alias for make run'
+	@printf '%s\n' '  make check         Run local validation checks'
+	@printf '%s\n' '  make clean         Remove the local image'
 
-cached-build:
-	docker build -t ${kcServiceName} .
+check-docker:
+	@command -v docker >/dev/null 2>&1 || { \
+		printf '%s\n' 'docker is required but was not found in PATH' >&2; \
+		exit 1; \
+	}
 
-#| - `make run`: Run the app
+check: check-docker
+	sh -n config/install-system.sh config/install-user.sh
+	docker build --check .
+
+build: check-docker
+	docker build --no-cache -t "$(IMAGE)" .
+
+cached-build: check-docker
+	docker build -t "$(IMAGE)" .
+
 run: cached-build
-	docker run \
-		-v ${PWD}:/home/user/workdir \
-		-it ${kcServiceName} /bin/zsh
+	docker run --rm \
+		--mount type=bind,src="$(WORKDIR)",dst=/home/user/workdir \
+		-it "$(IMAGE)" /bin/zsh
+
+shell: run
+
+clean: check-docker
+	docker image rm -f "$(IMAGE)"

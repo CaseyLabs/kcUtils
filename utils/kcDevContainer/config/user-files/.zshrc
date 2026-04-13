@@ -1,5 +1,5 @@
 # -- Shell aliases
-alias l='exa  -aF --group-directories-first --octal-permissions --no-permissions --no-time'
+alias l='eza -aF --group-directories-first --octal-permissions --no-permissions --no-time'
 alias ls='l'
 
 # -- Zsh configuration
