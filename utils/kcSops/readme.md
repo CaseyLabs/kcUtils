@@ -1,6 +1,6 @@
 # `kcSops`
   
-**A demo of Mozilla's [SOPS](https://github.com/getsops/sops) for file encryption, using AWS KMS and/or GCP KMS.**
+**A demo of [SOPS](https://github.com/getsops/sops) for file encryption, using AWS KMS and/or GCP KMS.**
 
 <!-- TOC -->
 
@@ -19,7 +19,7 @@
 
 ## What is SOPS?
 
-Mozilla's `SOPS` ("_secrets operations_") is an open-source tool written in Go. 
+`SOPS` ("_secrets operations_") is an open-source tool written in Go.
 
 SOPS is used to easily encrypt and decrypt sensitive data in a config files, such as `.env` files. 
 
@@ -170,7 +170,7 @@ for environment in "${environments[@]}"; do
 
   # Build the sops configuration for the environment
   sops_config+="
-  # Encrypt devtest env files with 
+  # Encrypt devtest env files with ${environment} KMS key
   - path_regex: .*devtest(\.encrypted)?\.env$
     kms: '${key_arn}'
   
@@ -262,17 +262,15 @@ KC_VAR4="value4"
 <details>
 <summary>Export steps</summary>
 
-Decrypt the encrypted `.env` file, and export its keys/values to your shell's environment variables.
+Decrypt the encrypted `.env` file, and pass its keys/values to a command's environment.
 
 ```sh
-export $(sops --decrypt devtest.encrypted.env | grep -v '^#' | xargs)
+sops exec-env devtest.encrypted.env 'echo "$KC_VAR1"'
 ```
 
 **Results:**
 
 ```sh
-echo $KC_VAR1
-
 value1
 ```
 </details>
@@ -321,7 +319,7 @@ else
 fi
 ```
 
-Decrypt the file with SOPS using the GCP KMS key:
+Decrypt the file with SOPS:
 
 ```sh
 export environment="devtest"
@@ -331,9 +329,7 @@ export key="${environment}-key"
 export encrypted_file="./secrets.encrypted.env"
 export decrypted_file="./secrets.decrypted.env"
 
-key_id="projects/$(gcloud config get-value project)/locations/${location}/keyRings/${keyring}/cryptoKeys/${key}"
-
-if sops --decrypt --gcp-kms "${key_id}" "${encrypted_file}" > "${decrypted_file}.tmp"; then
+if sops --decrypt "${encrypted_file}" > "${decrypted_file}.tmp"; then
     mv "${decrypted_file}.tmp" "${decrypted_file}"
 else
     echo "Decryption failed. No file was created."
@@ -368,4 +364,3 @@ cat <<EOT > ".gitignore"
 !*.encrypted.*
 EOT
 ```
-

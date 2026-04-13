@@ -6,16 +6,29 @@ if (-not ([bool] (New-Object Security.Principal.WindowsPrincipal([Security.Princ
 
 # Get the latest release tag from GitHub
 try {
-    $latest_release = (Invoke-RestMethod -Uri "https://api.github.com/repos/mozilla/sops/releases/latest").tag_name
+    $latest_release = (Invoke-RestMethod -Uri "https://api.github.com/repos/getsops/sops/releases/latest").tag_name
 } catch {
     Write-Host "Failed to retrieve the latest release tag."
     exit 1
 }
 
-$base_url = "https://github.com/mozilla/sops/releases/download/$latest_release"
+$base_url = "https://github.com/getsops/sops/releases/download/$latest_release"
 
 # Determine the appropriate SOPS binary URL
-$file = "sops-$latest_release.exe"
+switch ($env:PROCESSOR_ARCHITECTURE) {
+    "AMD64" {
+        $arch = "amd64"
+    }
+    "ARM64" {
+        $arch = "arm64"
+    }
+    default {
+        Write-Host "Unsupported architecture: $env:PROCESSOR_ARCHITECTURE"
+        exit 1
+    }
+}
+
+$file = "sops-$latest_release.$arch.exe"
 $url = "$base_url/$file"
 
 # Create the destination directory if it doesn't exist
