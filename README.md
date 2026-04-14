@@ -4,6 +4,10 @@ Miscellaneous utilities used by Casey Labs.
 
 ## Utils
 
+### [kcAgents](https://github.com/CaseyLabs/kcUtils/tree/main/utils/kcAgents)
+
+An collection of experimental `AGENTS.md` configs for AI CLIs, such as Codex CLI.
+
 ### [kcBlog](https://github.com/CaseyLabs/kcUtils/tree/main/utils/kcBlog)
 
 A static HTML generator that converts Markdown files into a simple documentation website.

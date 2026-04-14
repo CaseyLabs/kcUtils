@@ -1,0 +1,23 @@
+model = "gpt-5.4"
+model_reasoning_effort = "medium"
+model_verbosity = "low"
+project_doc_max_bytes = 12000
+
+[agents]
+max_threads = 3
+max_depth = 1
+
+[profiles.routine]
+model = "gpt-5.4-mini"
+model_reasoning_effort = "low"
+model_verbosity = "low"
+
+[profiles.standard]
+model = "gpt-5.4"
+model_reasoning_effort = "medium"
+model_verbosity = "low"
+
+[profiles.deep]
+model = "gpt-5.4"
+model_reasoning_effort = "high"
+model_verbosity = "low"
