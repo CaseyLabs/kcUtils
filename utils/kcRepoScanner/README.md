@@ -79,7 +79,7 @@ docker run --rm \
 This repository can publish `kcRepoScanner` to GitHub Container Registry as:
 
 ```sh
-ghcr.io/casylabs/kcutils/kcreposcanner:latest
+docker pull ghcr.io/caseylabs/kcutils/kcreposcanner:latest
 ```
 
 You can also run that image directly if it has already been published:
@@ -87,9 +87,10 @@ You can also run that image directly if it has already been published:
 ```sh
 reposcan() {
   docker run --rm \
-    --mount type=bind,src="$1",dst=/repo,readonly \
-    ghcr.io/casylabs/kcutils/kcreposcanner:latest
+  --mount type=bind,src="$1",dst=/repo,readonly \
+  ghcr.io/caseylabs/kcutils/kcreposcanner:latest
 }
 
-reposcan /path/to/repo
+# Then:
+reposcan ~/path/to/repo
 ```

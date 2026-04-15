@@ -1,4 +1,0 @@
-interface:
-  display_name: "Token-Efficient Delegation"
-  short_description: "Choose profiles and subagents efficiently"
-  default_prompt: "Use $token-efficient-delegation to choose the right Codex profile and subagent strategy."

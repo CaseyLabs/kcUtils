@@ -1,0 +1,4 @@
+interface:
+  display_name: "token-bot"
+  short_description: "token-bot is a token-efficient delegation orchestrator. Use this skill to control context growth and model spend while preserving quality."
+  default_prompt: "Use $token-bot to choose the right Codex profile and subagent strategy."

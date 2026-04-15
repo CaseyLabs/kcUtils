@@ -1,20 +1,20 @@
 ---
-name: token-efficient-delegation
+name: token-bot
 description: Use when a task may benefit from profile selection, deep-mode escalation, or bounded subagent delegation to reduce Codex CLI token usage. Trigger for broad repo analysis, multi-file debugging, reviews, planning, ambiguous implementation requests, or when the user asks whether to use routine, standard, deep, mini subagents, subagents, or token-saving workflows.
 metadata:
   short-description: Choose profiles and subagents efficiently
 ---
 
-# Token-Efficient Delegation
+# token-bot
 
-Use this skill to control context growth and model spend while preserving quality.
+`token-bot` is a token-efficient delegation skill. Use this skill to control context growth and model spend while preserving quality.
 
 ## Default stance
 
+- You may be autonomous in your decision whether or not to run subagents without input or requirement from me.
 - Prefer the smallest capable workflow: focused local work before delegation.
 - Keep tasks short. Start a fresh session after a clear task boundary instead of carrying a large thread forward.
 - Do not use subagents for simple questions, one-file edits, direct command output, or tightly coupled changes.
-- Do not spawn subagents unless the user explicitly asks for subagents, delegation, or parallel agent work.
 
 ## Profile choice
 
