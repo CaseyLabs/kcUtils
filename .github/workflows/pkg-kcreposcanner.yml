@@ -78,8 +78,15 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          package_name="kcreposcanner"
-          package_url=$(gh api "/orgs/CaseyLabs/packages/container/${package_name}" --jq '.url')
+          owner="${GITHUB_REPOSITORY_OWNER}"
+          package_name="kcutils%2Fkcreposcanner"
+          owner_type=$(gh api "/users/${owner}" --jq '.type')
+          if [ "${owner_type}" = "Organization" ]; then
+            package_endpoint="/orgs/${owner}/packages/container/${package_name}"
+          else
+            package_endpoint="/users/${owner}/packages/container/${package_name}"
+          fi
+          package_url=$(gh api "${package_endpoint}" --jq '.url')
           if [ -z "$package_url" ]; then
             printf '%s\n' "failed to locate package url for ${package_name}" >&2
             exit 1
