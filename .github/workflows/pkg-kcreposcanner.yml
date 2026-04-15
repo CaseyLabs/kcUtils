@@ -51,6 +51,8 @@ jobs:
           tags: |
             type=raw,value=latest
             type=sha,format=short
+          labels: |
+            org.opencontainers.image.source=https://github.com/CaseyLabs/kcUtils/tree/main/utils/kcRepoScanner
 
       - name: Build and push Docker image
         id: build-and-push
