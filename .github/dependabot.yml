@@ -49,7 +49,7 @@ updates:
     schedule:
       interval: "monthly"
     commit-message:
-      prefix: "[deserveependabot]"
+      prefix: "[dependabot]"
       include: "scope"
     groups:
       minor-and-patch:
