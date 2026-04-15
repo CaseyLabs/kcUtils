@@ -1,5 +1,6 @@
 IMAGE ?= kc-repo-scanner:local
-TARGET ?= $(CURDIR)
+REPO ?= $(CURDIR)
+TARGET ?= $(REPO)
 DOCKERFILE ?= Dockerfile
 
 .PHONY: help build scan scan-json clean check-docker check-target
@@ -7,7 +8,7 @@ DOCKERFILE ?= Dockerfile
 help:
 	@printf '%s\n' 'Targets:'
 	@printf '%s\n' '  make build      Build the portable scanner image'
-	@printf '%s\n' '  make scan       Run the scanner against TARGET (default: current directory)'
+	@printf '%s\n' '  make scan       Run the scanner against REPO or TARGET (default: current directory)'
 	@printf '%s\n' '  make scan-json  Run with verbose JSON gitleaks output'
 	@printf '%s\n' '  make clean      Remove the local scanner image'
 

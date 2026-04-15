@@ -19,6 +19,12 @@ make scan TARGET=/path/to/your/repo
 
 That builds the scanner image and runs it against the target directory.
 
+If you prefer, `REPO=/path/to/your/repo` works too:
+
+```sh
+make scan REPO=/path/to/your/repo
+```
+
 ## Quick Setup
 
 ```sh
@@ -66,4 +72,24 @@ docker run --rm \
   -e TRIVY_SCANNERS=misconfig \
   -e TRIVY_SEVERITY=HIGH,CRITICAL \
   kc-repo-scanner:local
+```
+
+## Published Image
+
+This repository can publish `kcRepoScanner` to GitHub Container Registry as:
+
+```sh
+ghcr.io/casylabs/kcutils/kcreposcanner:latest
+```
+
+You can also run that image directly if it has already been published:
+
+```sh
+reposcan() {
+  docker run --rm \
+    --mount type=bind,src="$1",dst=/repo,readonly \
+    ghcr.io/casylabs/kcutils/kcreposcanner:latest
+}
+
+reposcan /path/to/repo
 ```

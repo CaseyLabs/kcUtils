@@ -28,6 +28,9 @@ A simple README generator for source code documentation, generated from comments
 
 A Docker-based security and vulnerability scanner for Git Repositories.
 
+Published image:
+`ghcr.io/casylabs/kcutils/kcreposcanner:latest`
+
 ### [kcShell](https://github.com/CaseyLabs/kcUtils/tree/main/utils/kcShell)
 
 A collection of shell script helper functions to simplify common commands and script writing.
