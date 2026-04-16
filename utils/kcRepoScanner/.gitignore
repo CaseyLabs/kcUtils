@@ -1,4 +1,5 @@
 .cache/
+.env
 *.log
 *.tmp
 *.temp
