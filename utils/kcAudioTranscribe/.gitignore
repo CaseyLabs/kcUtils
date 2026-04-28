@@ -1,0 +1,11 @@
+transcripts/
+__pycache__/
+*.pyc
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+.coverage.*
+.mp4
+.m4a
+.wav

@@ -4,9 +4,9 @@ Miscellaneous utilities used by Casey Labs.
 
 ## Utils
 
-### [kcAgents](https://github.com/CaseyLabs/kcUtils/tree/main/utils/kcAgents)
+### [kcAudioTranscribe](https://github.com/CaseyLabs/kcUtils/tree/main/utils/kcAudioTranscribe)
 
-An collection of experimental `AGENTS.md` configs for AI CLIs, such as Codex CLI.
+Docker-driven tool that uses a local OpenAI Whisper AI model to extract audio from a video, and then convert it to a transcript text file.
 
 ### [kcBlog](https://github.com/CaseyLabs/kcUtils/tree/main/utils/kcBlog)
 
@@ -27,9 +27,6 @@ A simple README generator for source code documentation, generated from comments
 ### [kcRepoScanner](https://github.com/CaseyLabs/kcUtils/tree/main/utils/kcRepoScanner)
 
 A Docker-based security and vulnerability scanner for Git Repositories.
-
-Published image:
-`ghcr.io/casylabs/kcutils/kcreposcanner:latest`
 
 ### [kcShell](https://github.com/CaseyLabs/kcUtils/tree/main/utils/kcShell)
 
