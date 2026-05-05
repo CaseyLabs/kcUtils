@@ -30,30 +30,53 @@
 #     Limit the Trivy findings that appear in the report.
 #   -e SCAN_TARGET=/some/path
 #     Scan a different mount path inside the container.
+#   -e SCAN_DEPENDENCIES=false
+#     Override dependency scanning. Supported values: auto, true, false.
+#   -e SCAN_IAC=false
+#     Override Dockerfile/IaC misconfiguration scanning. Supported values:
+#     auto, true, false.
+#   -e SCAN_GITHUB_ACTIONS=false
+#     Override GitHub Actions linting. Supported values: auto, true, false.
+#   -e SCAN_SHELL=false
+#     Override shell script linting. Supported values: auto, true, false.
+#   -e SCAN_INSPECT_ONLY=true
+#     Print the repository inventory and scan plan without running scanners.
 #
 # Behavior:
 # - Gitleaks scans Git history when `.git/` is present, otherwise it falls back
 #   to filesystem-only scanning.
-# - Grype scans the mounted directory for package vulnerabilities.
-# - Trivy scans the mounted directory for misconfigurations such as Dockerfile
-#   and IaC security-posture issues.
+# - Grype scans the mounted directory for package vulnerabilities when common
+#   dependency manifests or lockfiles are present.
+# - Trivy scans the mounted directory for misconfigurations when common
+#   Dockerfile/IaC files are present.
 # - actionlint checks GitHub Actions workflows when `.github/workflows/` exists.
-# - The image always runs all stages and returns non-zero if any stage finds
+# - ShellCheck checks shell files when common shell extensions or shell shebangs
+#   are present.
+# - The image always runs Gitleaks plus applicable stages and returns non-zero if any stage finds
 #   issues at its configured threshold.
 
 FROM anchore/grype:v0.111.0@sha256:af9f30d1de4ecfbbcd2b674371e8df787879e16832af8ab81551b0bf1ec0ad5b AS grype
 FROM aquasec/trivy:0.69.3@sha256:bcc376de8d77cfe086a917230e818dc9f8528e3c852f7b1aff648949b6258d1c AS trivy
 FROM rhysd/actionlint:latest@sha256:b1934ee5f1c509618f2508e6eb47ee0d3520686341fec936f3b79331f9315667 AS actionlint
+FROM ghcr.io/zizmorcore/zizmor:1.24.1@sha256:128ebbe369a95f9d4427737e794537256095b55f779a247aebc960dc4ea1f7b3 AS zizmor
+FROM koalaman/shellcheck:stable@sha256:bb596a0d169b85ddd81d8b6d3a2ff6d5baf5fca10b97f575ebc647c3dff62b3d AS shellcheck
 
-# Use the official Gitleaks image as the runtime base because it already
-# includes Git plus a minimal shell environment.
-FROM ghcr.io/gitleaks/gitleaks:v8.30.1@sha256:c00b6bd0aeb3071cbcb79009cb16a60dd9e0a7c60e2be9ab65d25e6bc8abbb7f
+# Use a glibc runtime so the official zizmor binary can run alongside the
+# other scanner binaries.
+FROM debian:trixie-slim@sha256:cedb1ef40439206b673ee8b33a46a03a0c9fa90bf3732f54704f99cb061d2c5a
+
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends ca-certificates git \
+    && rm -rf /var/lib/apt/lists/*
 
 # Copy the standalone binaries into the final image so one container can
 # perform all scans locally without nested Docker calls.
+COPY --from=ghcr.io/gitleaks/gitleaks:v8.30.1@sha256:c00b6bd0aeb3071cbcb79009cb16a60dd9e0a7c60e2be9ab65d25e6bc8abbb7f /usr/bin/gitleaks /usr/local/bin/gitleaks
 COPY --from=grype /grype /usr/local/bin/grype
 COPY --from=trivy /usr/local/bin/trivy /usr/local/bin/trivy
 COPY --from=actionlint /usr/local/bin/actionlint /usr/local/bin/actionlint
+COPY --from=zizmor /usr/bin/zizmor /usr/local/bin/zizmor
+COPY --from=shellcheck /bin/shellcheck /usr/local/bin/shellcheck
 
 ENV HOME=/tmp \
     XDG_CACHE_HOME=/tmp/.cache \
@@ -66,67 +89,15 @@ ENV HOME=/tmp \
     GRYPE_FAIL_ON=high \
     TRIVY_SCANNERS=misconfig \
     TRIVY_SEVERITY=HIGH,CRITICAL \
-    TRIVY_SKIP_DB_UPDATE=true
+    TRIVY_SKIP_DB_UPDATE=true \
+    SCAN_DEPENDENCIES=auto \
+    SCAN_IAC=auto \
+    SCAN_GITHUB_ACTIONS=auto \
+    SCAN_SHELL=auto \
+    SCAN_INSPECT_ONLY=false
 
 WORKDIR /work
+COPY --chmod=755 scanner.sh /usr/local/bin/kc-repo-scanner
 USER 65532:65532
 ENTRYPOINT []
-
-CMD ["/bin/sh", "-eu", "-c", "\
-target=${SCAN_TARGET:-/repo}; \
-[ -d \"$target\" ] || { printf 'scan target not found: %s\\n' \"$target\" >&2; exit 1; }; \
-mkdir -p \"$XDG_CACHE_HOME\" \"$GRYPE_DB_CACHE_DIR\"; \
-unset GITLEAKS_CONFIG GITLEAKS_CONFIG_TOML; \
-gitleaks_status=0; \
-grype_status=0; \
-trivy_status=0; \
-actionlint_status=0; \
-set -- --source \"$target\" --no-banner --exit-code 1; \
-if [ \"${GITLEAKS_VERBOSE}\" = 'true' ]; then \
-  set -- \"$@\" -v; \
-fi; \
-if [ \"${GITLEAKS_REDACT}\" = 'true' ]; then \
-  set -- \"$@\" --redact; \
-fi; \
-if [ -n \"${GITLEAKS_REPORT_FORMAT}\" ]; then \
-  set -- \"$@\" --report-format \"${GITLEAKS_REPORT_FORMAT}\" --report-path -; \
-fi; \
-printf '\\n==> Secret scan (gitleaks)\\n'; \
-if [ -d \"$target/.git\" ]; then \
-  git config --global --add safe.directory \"$target\"; \
-  gitleaks detect \"$@\" || gitleaks_status=$?; \
-else \
-  gitleaks detect \"$@\" --no-git || gitleaks_status=$?; \
-fi; \
-printf '\\n==> Vulnerability scan (grype)\\n'; \
-grype \"dir:$target\" --exclude '**/.git' --fail-on \"$GRYPE_FAIL_ON\" -o table || grype_status=$?; \
-printf '\\n==> Misconfiguration scan (trivy)\\n'; \
-set -- fs --scanners \"$TRIVY_SCANNERS\" --severity \"$TRIVY_SEVERITY\" --skip-dirs \"$target/.git\" --skip-version-check --exit-code 1 \"$target\"; \
-if [ \"${TRIVY_SKIP_DB_UPDATE}\" = 'true' ]; then \
-  set -- \"$@\" --skip-db-update --skip-java-db-update; \
-fi; \
-trivy \"$@\" || trivy_status=$?; \
-printf '\\n==> Workflow lint (actionlint)\\n'; \
-if [ -d \"$target/.github/workflows\" ]; then \
-  if find \"$target/.github/workflows\" -maxdepth 1 -type f \\( -name '*.yml' -o -name '*.yaml' \\) | grep -q .; then \
-    (cd \"$target\" && actionlint -shellcheck= -pyflakes=) || actionlint_status=$?; \
-  else \
-    printf 'no workflow files found under %s/.github/workflows\\n' \"$target\"; \
-  fi; \
-else \
-  printf 'no .github/workflows directory found under %s\\n' \"$target\"; \
-fi; \
-if [ \"$gitleaks_status\" -ne 0 ]; then \
-  printf 'gitleaks exited with status %s\\n' \"$gitleaks_status\" >&2; \
-fi; \
-if [ \"$grype_status\" -ne 0 ]; then \
-  printf 'grype exited with status %s\\n' \"$grype_status\" >&2; \
-fi; \
-if [ \"$trivy_status\" -ne 0 ]; then \
-  printf 'trivy exited with status %s\\n' \"$trivy_status\" >&2; \
-fi; \
-if [ \"$actionlint_status\" -ne 0 ]; then \
-  printf 'actionlint exited with status %s\\n' \"$actionlint_status\" >&2; \
-fi; \
-[ \"$gitleaks_status\" -eq 0 ] && [ \"$grype_status\" -eq 0 ] && [ \"$trivy_status\" -eq 0 ] && [ \"$actionlint_status\" -eq 0 ] \
-"]
+CMD ["/usr/local/bin/kc-repo-scanner"]

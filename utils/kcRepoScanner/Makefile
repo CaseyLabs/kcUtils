@@ -3,11 +3,12 @@ REPO ?= $(CURDIR)
 TARGET ?= $(REPO)
 DOCKERFILE ?= Dockerfile
 
-.PHONY: help build scan scan-json clean check-docker check-target
+.PHONY: help build inspect scan scan-json clean check-docker check-target
 
 help:
 	@printf '%s\n' 'Targets:'
 	@printf '%s\n' '  make build      Build the portable scanner image'
+	@printf '%s\n' '  make inspect    Show detected repo shape and enabled scanners'
 	@printf '%s\n' '  make scan       Run the scanner against REPO or TARGET (default: current directory)'
 	@printf '%s\n' '  make scan-json  Run with verbose JSON gitleaks output'
 	@printf '%s\n' '  make clean      Remove the local scanner image'
@@ -23,9 +24,19 @@ check-target:
 		printf 'scan target not found: %s\n' "$(TARGET)" >&2; \
 		exit 1; \
 	}
+	@[ -r "$(TARGET)" ] && [ -x "$(TARGET)" ] || { \
+		printf 'scan target is not readable/searchable: %s\n' "$(TARGET)" >&2; \
+		exit 1; \
+	}
 
 build: check-docker
 	docker build -f "$(DOCKERFILE)" -t "$(IMAGE)" .
+
+inspect: build check-target
+	@docker run --rm \
+		--mount type=bind,src="$(TARGET)",dst=/repo,readonly \
+		-e SCAN_INSPECT_ONLY=true \
+		"$(IMAGE)"
 
 scan: build check-target
 	@docker run --rm \

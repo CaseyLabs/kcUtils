@@ -1,13 +1,16 @@
 # `kcRepoScanner`
 
-A small Docker-based utility for scanning any local Git repository with one portable image.
+A small Docker-based utility for scanning any local Git repository with one portable image. It detects the target repository shape first, then runs the scanners that apply.
 
 ## What It Runs
 
 - `gitleaks` for secret scanning, including Git history when `.git/` is present
-- `grype` for package vulnerability scanning
-- `trivy` for Dockerfile and IaC misconfiguration scanning
-- `actionlint` for GitHub Actions workflow linting
+- `grype` for package vulnerability scanning when dependency manifests or lockfiles are present
+- `trivy` for Dockerfile and IaC misconfiguration scanning when common infra files are present
+- `actionlint` for GitHub Actions workflow linting when GitHub workflow files are present
+- `shellcheck` for shell script linting when common shell script files or shell shebangs are present
+
+The scanner does not run project-defined commands such as `npm install`, `go test`, Gradle tasks, or shell scripts from the target repository.
 
 ## Quick Start
 
@@ -42,19 +45,53 @@ make scan TARGET="${myRepo}"
 
 ```sh
 make build
+make inspect
+make inspect TARGET=/path/to/your/repo
 make scan
 make scan TARGET=/path/to/your/repo
 make scan-json TARGET=/path/to/your/repo
 make clean
 ```
 
+## Inspect First
+
+Use `make inspect` when you do not know what language, dependency manager, infrastructure files, or CI system the target repository uses:
+
+```sh
+make inspect TARGET=/path/to/your/repo
+```
+
+That prints an inventory and the scan plan without running scanners. Example output:
+
+```text
+==> Repository inventory
+target: /repo
+git repository: yes
+languages: Go, JavaScript/Node
+dependency files: go.mod, go.sum, package.json, package-lock.json
+infra files: Dockerfile, Terraform
+ci systems: none detected
+shell files: 2 detected
+
+==> Enabled scanners
+gitleaks: enabled
+grype: enabled
+trivy misconfig: enabled
+actionlint: skipped (no GitHub Actions workflow files detected)
+shellcheck: enabled
+```
+
 ## Notes
 
 - `make scan-json` enables verbose Gitleaks logs and prints JSON findings to stdout.
-- The scanner always runs all stages and exits non-zero if any stage reports findings.
+- The scanner always runs Gitleaks. Other scanners default to `auto` and are skipped when their input type is not present.
+- The scanner exits non-zero if any enabled stage reports findings.
 - `make scan` and `make scan-json` now do simple preflight checks for `docker` and the target directory before starting the container.
 - The image mounts the target repository read-only at `/repo`.
+- The target directory must be readable and searchable by the container's non-root scanner user.
 - Workflow linting only runs when `.github/workflows/` exists in the target repository.
+- ShellCheck runs for `*.sh`, `*.bash`, `*.dash`, `*.ksh`, and files with supported shell shebangs.
+- Non-GitHub CI systems are detected in the inventory, but only GitHub Actions currently has a built-in linter.
 
 ## Runtime Options
 
@@ -71,6 +108,21 @@ docker run --rm \
   -e GRYPE_FAIL_ON=critical \
   -e TRIVY_SCANNERS=misconfig \
   -e TRIVY_SEVERITY=HIGH,CRITICAL \
+  -e SCAN_DEPENDENCIES=auto \
+  -e SCAN_IAC=auto \
+  -e SCAN_GITHUB_ACTIONS=auto \
+  -e SCAN_SHELL=auto \
+  kc-repo-scanner:local
+```
+
+The `SCAN_DEPENDENCIES`, `SCAN_IAC`, `SCAN_GITHUB_ACTIONS`, and `SCAN_SHELL` options accept `auto`, `true`, or `false`. Use `true` to force a scanner on and `false` to force it off.
+
+To inspect without scanning:
+
+```sh
+docker run --rm \
+  --mount type=bind,src="/path/to/repo",dst=/repo,readonly \
+  -e SCAN_INSPECT_ONLY=true \
   kc-repo-scanner:local
 ```
 
