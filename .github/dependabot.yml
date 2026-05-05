@@ -9,9 +9,11 @@ updates:
     directory: "/"
     schedule:
       interval: "monthly"
+    cooldown:
+      default-days: 7
     # Control the commit message and PR title format that Dependabot uses.
     commit-message:
-      prefix: "[dependabot]"
+      prefix: "deps:"
       # Include the dependency scope in the title/message when possible.
       include: "scope"
     # Group GitHub Actions updates into a single PR.
@@ -28,12 +30,11 @@ updates:
   # Check Dockerfiles used by this repository.
   - package-ecosystem: "docker"
     directories:
-      - "/utils/kcAudioTranscribe"
-      - "/utils/kcBlog"
-      - "/utils/kcDevContainer"
-      - "/utils/kcRepoScanner"
+      - "/"
     schedule:
       interval: "monthly"
+    cooldown:
+      default-days: 7
     commit-message:
       prefix: "[dependabot]"
       include: "scope"
@@ -47,9 +48,11 @@ updates:
 
   # Check Python dependencies used by kcBlog.
   - package-ecosystem: "pip"
-    directory: "/utils/kcBlog/app"
+    directory: "/"
     schedule:
       interval: "monthly"
+    cooldown:
+      default-days: 7
     commit-message:
       prefix: "[dependabot]"
       include: "scope"
