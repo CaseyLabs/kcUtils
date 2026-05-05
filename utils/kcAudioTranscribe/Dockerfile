@@ -12,7 +12,10 @@ RUN pip install --no-cache-dir -U pip \
     && pip install --no-cache-dir more-itertools numba numpy tiktoken tqdm \
     && pip install --no-cache-dir --no-deps openai-whisper
 
+RUN useradd --create-home --shell /usr/sbin/nologin appuser
+
 WORKDIR /app
 COPY src/transcribe_tui.py /app/transcribe_tui.py
 
+USER appuser
 CMD ["python", "/app/transcribe_tui.py"]
