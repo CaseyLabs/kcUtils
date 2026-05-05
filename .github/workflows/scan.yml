@@ -1,0 +1,38 @@
+---
+# yamllint disable rule:line-length
+name: Security Scan
+
+"on":
+  push:
+    branches:
+      - main
+  pull_request:
+    types:
+      - opened
+      - synchronize
+      - reopened
+      - ready_for_review
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  scan:
+    name: scan-repo
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository history
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd  # v6.0.2
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Build scanner image
+        run: make -C utils/kcRepoScanner build
+
+      - name: Run repository scan
+        run: make -C utils/kcRepoScanner scan TARGET="${GITHUB_WORKSPACE}"

@@ -1,5 +1,6 @@
+---
 # Dependabot config
-# - Automatically checks for outdated dependencies and open pull requests to update them.
+# - Automatically checks for outdated dependencies and opens pull requests.
 
 version: 2
 updates:
@@ -27,6 +28,7 @@ updates:
   # Check Dockerfiles used by this repository.
   - package-ecosystem: "docker"
     directories:
+      - "/utils/kcAudioTranscribe"
       - "/utils/kcBlog"
       - "/utils/kcDevContainer"
       - "/utils/kcRepoScanner"
