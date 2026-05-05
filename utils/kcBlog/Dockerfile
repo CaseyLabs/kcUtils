@@ -11,8 +11,10 @@ FROM python:slim
 RUN useradd -m user
 
 # Install system dependencies
-RUN apt-get update && apt-get install -y \
-  curl
+RUN apt-get update \
+  && apt-get install -y --no-install-recommends \
+    curl \
+  && rm -rf /var/lib/apt/lists/*
 
 # Switch to non-root user
 USER user
