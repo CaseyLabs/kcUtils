@@ -1,6 +1,9 @@
 ---
 version: 2
 
+# Dependabot config
+# - Automatically checks for outdated dependencies and opens pull requests.
+
 updates:
   - package-ecosystem: "github-actions"
     directory: "/"
@@ -21,13 +24,17 @@ updates:
           - "patch"
 
   - package-ecosystem: "docker"
-    directory: "/"
+    directories:
+      - "/utils/kcAudioTranscribe"
+      - "/utils/kcBlog"
+      - "/utils/kcDevContainer"
+      - "/utils/kcRepoScanner"
     schedule:
       interval: "monthly"
     cooldown:
       default-days: 7
     commit-message:
-      prefix: "[dependabot]"
+      prefix: "deps:"
       include: "scope"
     groups:
       minor-and-patch:
@@ -38,13 +45,14 @@ updates:
           - "patch"
 
   - package-ecosystem: "pip"
-    directory: "/"
+    directories:
+      - "/utils/kcBlog"
     schedule:
       interval: "monthly"
     cooldown:
       default-days: 7
     commit-message:
-      prefix: "[dependabot]"
+      prefix: "deps:"
       include: "scope"
     groups:
       minor-and-patch:
