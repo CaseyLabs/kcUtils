@@ -22,7 +22,11 @@ A portable, standardized Docker development environment container.
 
 ### [kcDocGen](https://github.com/CaseyLabs/kcUtils/tree/main/utils/kcDocGen)
 
-A simple README generator for source code documentation, generated from comments within your code. 
+A simple README generator for source code documentation, generated from comments within your code.
+
+### [kcNotebookAI](https://github.com/CaseyLabs/kcUtils/tree/main/utils/kcNotebookAI)
+
+An AI knowledge curation workflow, using Google's NotebookLM and Gemini CLI tools.
 
 ### [kcRepoScanner](https://github.com/CaseyLabs/kcUtils/tree/main/utils/kcRepoScanner)
 
