@@ -1,0 +1,33 @@
+.workflow_state.json
+.workflow_state.json.tmp
+
+# Local environment and credentials
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+*.p12
+*.pfx
+*credentials*.json
+*credential*.json
+*secret*.json
+*secrets*.json
+*token*.json
+cookies*.json
+service-account*.json
+.secrets/
+secrets/
+credentials/
+
+# Local tool state and caches
+.cache/
+.pytest_cache/
+__pycache__/
+*.py[cod]
+node_modules/
+
+# Corpus inputs and generated outputs
+input/*.pdf
+input/processed/*.pdf
+output/

@@ -1,0 +1,34 @@
+# FINAL SOURCE-GROUNDED KNOWLEDGE SUMMARY
+
+ROLE: Act as a rigorous academic editor for source-grounded knowledge summaries.
+
+OBJECTIVE: Produce one polished, in-depth markdown summary from the provided NotebookLM evidence. This is a source-grounded synthesis task, not open-ended research.
+
+SOURCE BOUNDARY:
+
+- Use only the NotebookLM evidence provided in the input.
+- Do not use web research, model memory, general background, or unsupported assumptions.
+- If `TARGETS_MD_HARD_SCOPE` contains targets, include only those pages, chapters, or topics. Treat all other source content as out of scope.
+- If the evidence does not support a detail, omit it or state that the source evidence does not establish it.
+
+REVISION TASK:
+
+- Verify the final document against the `Coverage Checklist` and `Accuracy Warnings`.
+- Expand sections when the evidence shows missing important in-scope coverage.
+- Correct terminology, named methods, claims, findings, classifications, definitions, and conceptual distinctions.
+- Preserve meaningful source distinctions where they affect interpretation, limits, or disagreements.
+- Convert NotebookLM citation markers, page references, and source details into Wikipedia-style numbered citations.
+- Cite every paragraph that contains source-grounded claims, every table row or bullet with substantive claims, and all direct quotations or close paraphrases.
+- Reuse the same citation number for repeated references to the same source location or evidence cluster.
+- Do not invent bibliographic fields. If the evidence lacks author, title, date, or page detail, use the most precise source label and NotebookLM marker available.
+- Keep the output rigorous, objective, and useful for understanding and applying the source material.
+
+OUTPUT FORMAT:
+
+- Return only the final markdown summary text.
+- Use markdownlint-compatible markdown: one blank line around headings and lists, one space after list markers, no trailing spaces, and no emphasis-only pseudo-headings.
+- Make headings unique across the document.
+- Use inline numbered citations in square brackets, such as `[1]` or `[2]`, immediately after the supported sentence or clause.
+- End the document with `## References`.
+- Under `## References`, list citations as a numbered Markdown list where each item maps to the cited source, page range, NotebookLM marker, or evidence-cluster label.
+- Do not call tools, read files, write files, save files, or mention workflow/runtime/tool status.

@@ -1,0 +1,4 @@
+interface:
+  display_name: "Summary Accuracy Verification"
+  short_description: "Verify the generated corpus summary against the prepared NotebookLM notebook."
+  default_prompt: "Verify output/summary.md against the prepared corpus NotebookLM notebook using prompt2.txt, preserving numbered inline citations and the References section."

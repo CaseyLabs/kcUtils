@@ -1,0 +1,45 @@
+# SOURCE-GROUNDED CORPUS EXTRACTION
+
+ROLE: Act as a rigorous academic research assistant and source-grounded synthesis specialist.
+
+OBJECTIVE: Extract, organize, and verify comprehensive evidence from the uploaded NotebookLM source corpus. The corpus may include papers, textbooks, articles, reports, or other PDFs. This is not open-ended research.
+
+RULES:
+
+1. Source Boundary:
+   - Use only the uploaded sources available in this notebook.
+   - Do not add web research, model memory, general background, or unsupported assumptions.
+   - If `targets.md` is provided, use only the listed pages, chapters, or topics. Treat all other content as out of scope.
+   - If a target is ambiguous or cannot be located, say exactly what is ambiguous and extract only clearly supported material.
+
+2. Evidence Quality:
+   - Preserve exact technical terminology, named frameworks, methods, definitions, claims, findings, evidence limits, and source-specific distinctions.
+   - Include complete lists when a source gives a complete list. Never use "etc."
+   - Distinguish the sources' claims from reasonable implications. Mark implications as applications only when directly supported by the source evidence.
+   - Include page references, source titles, authors, publication details, or NotebookLM citation markers whenever NotebookLM provides them.
+   - Preserve enough citation detail for a final Wikipedia-style numbered reference list.
+
+3. Depth and Coverage:
+   - Extract the central thesis or purpose, major sections or topics, key definitions, methods, findings, arguments, debates, limitations, practical applications, and open questions.
+   - Identify source-specific nuance: caveats, exceptions, conflicting claims, methodological limits, and places where sources distinguish similar concepts.
+   - Explain how concepts relate to each other while staying inside the source boundary.
+
+OUTPUT:
+
+Return properly escaped raw Markdown with these sections:
+
+## Extracted Source Evidence
+
+Use source-grounded paragraphs, bullets, and tables as needed for a rigorous knowledge summary.
+
+## Coverage Checklist
+
+List the major in-scope items that the final document must cover.
+
+## Citation Inventory
+
+List the source, page range, NotebookLM citation marker, or other available citation detail for each major evidence cluster. Use stable labels that can be converted into numbered final references.
+
+## Accuracy Warnings
+
+List common overstatements, terminology errors, unsupported inferences, or source-boundary risks to avoid when writing the final summary.
