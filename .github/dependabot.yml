@@ -1,23 +1,16 @@
 ---
-# Dependabot config
-# - Automatically checks for outdated dependencies and opens pull requests.
-
 version: 2
+
 updates:
-  # Check GitHub Actions used by this repo.
   - package-ecosystem: "github-actions"
     directory: "/"
     schedule:
       interval: "monthly"
     cooldown:
       default-days: 7
-    # Control the commit message and PR title format that Dependabot uses.
     commit-message:
       prefix: "deps:"
-      # Include the dependency scope in the title/message when possible.
       include: "scope"
-    # Group GitHub Actions updates into a single PR.
-    # - This reduces the number of Dependabot PRs you have to review.
     groups:
       actions:
         patterns:
@@ -27,10 +20,8 @@ updates:
           - "minor"
           - "patch"
 
-  # Check Dockerfiles used by this repository.
   - package-ecosystem: "docker"
-    directories:
-      - "/"
+    directory: "/"
     schedule:
       interval: "monthly"
     cooldown:
@@ -46,7 +37,6 @@ updates:
           - "minor"
           - "patch"
 
-  # Check Python dependencies used by kcBlog.
   - package-ecosystem: "pip"
     directory: "/"
     schedule:
