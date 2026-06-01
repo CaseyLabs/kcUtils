@@ -63,7 +63,7 @@ FROM koalaman/shellcheck:stable@sha256:bb596a0d169b85ddd81d8b6d3a2ff6d5baf5fca10
 
 # Use a glibc runtime so the official zizmor binary can run alongside the
 # other scanner binaries.
-FROM debian:trixie-slim@sha256:cedb1ef40439206b673ee8b33a46a03a0c9fa90bf3732f54704f99cb061d2c5a
+FROM debian:trixie-slim@sha256:b6e2a152f22a40ff69d92cb397223c906017e1391a73c952b588e51af8883bf8
 
 RUN apt-get update \
     && apt-get install -y --no-install-recommends ca-certificates git \
